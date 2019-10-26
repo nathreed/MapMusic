@@ -17,32 +17,45 @@
 
 </head>
 	<body>
-		<div id="mapDrawingUIContainer">
-			<canvas id="drawing"></canvas>
-			<div id="map" style="height: 100vh; width: 100vw;"></div>
+		<div id="wholeUIContainer">
+			<div id="mapToolbar">Hi! I'm the map toolbar</div>
+			<div id="mapContainer">
+				<canvas id="drawingLayer"></canvas>
+				<div id="mapLayer"></div>
+			</div>
+			<div id="audioControlsContainer">Hi! I'm the audio controls</div>
+			<div id="loopEditorContainer">Hi! I'm the loop editor</div>
 		</div>
 
 		<script>
 			// Map settings
-			const startCenter = [43.12861, -77.630081];
+			let savedPlaces = [
+				{name: "Grand Canyon", coordinates: [36.1307675,-112.0945079], zoom: 12},
+				{name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
+				{name: "University of Rochester", coordinates: [43.1289624, -77.629125], zoom: 16},
+				{name: "Mount Everest", coordinates: [27.9881199, 86.9162203], zoom: 12},
+				{name: "Death Valley", coordinates: [36.5045059, -117.078918], zoom: 13},
+				{name: "Shenandoah River", coordinates: [38.8943634, -78.4618465], zoom: 13},
+				{name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
+			];
 			const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 			const urlRGBheight = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";
 			const accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
 
 			// Map initialization
-			let mymap = L.map("map").setView(startCenter, 16);
+			let mymap = L.map("mapLayer").setView(savedPlaces[0].coordinates, savedPlaces[0].zoom);
 			
 			// Mapbox map layers
 			let terrainVisible = L.tileLayer(urlTerrain, {
 				attribution: "",
-				minZoom: 0,
+				minZoom: 1,
 				maxZoom: 18,
 				accessToken: accessToken
 			}).addTo(mymap);
 
 			let elevationData = L.tileLayer.colorPicker(urlRGBheight, {
 				attribution: "",
-				minZoom: 0,
+				minZoom: 1,
 				maxZoom: 18,
 				maxNativeZoom: 14,
 				opacity: 0.0,
@@ -57,15 +70,16 @@
       pathsAsPolylines = []
       pathsAsElevations = [];
 
-			let canvasSelected = document.getElementById("drawing");
-			let context = canvasSelected.getContext("2d");
+			let canvasDOM = document.getElementById("drawingLayer");
+			let canvasContext = canvasDOM.getContext("2d");
 
 			// Update canvas coordinate system
-			canvasSelected.width = window.innerWidth;
-			canvasSelected.height = window.innerHeight;
+			let mapContainerDOM = document.getElementById("mapContainer");
+			canvasDOM.width = mapContainerDOM.offsetWidth;
+			canvasDOM.height = mapContainerDOM.offsetHeight;
 			window.onresize = function(e){
-				canvasSelected.width = window.innerWidth;
-				canvasSelected.height = window.innerHeight;
+				canvasDOM.width = mapContainerDOM.offsetWidth;
+				canvasDOM.height = mapContainerDOM.offsetHeight;
 			};
 
 			// Drawing code
@@ -75,7 +89,7 @@
 			let lineCoordinates = [];
 			const distanceThreshold = 5;
 
-			canvasSelected.onmousedown = function(e) {
+			canvasDOM.onmousedown = function(e) {
 				console.log("hi");
 				painting = true;
 				const mouseLocation = L.point(e.pageX - this.offsetLeft,
@@ -84,39 +98,39 @@
 				lineCoordinates.push(mouseLocation);
 				
 				// Start drawing a line
-				context.strokeStyle = draftingLineColor;
-				context.lineJoin = "round";
-				context.lineCap = "round";
-				context.lineWidth = 1;
-				context.beginPath();
-				context.moveTo(mouseLocation.x, mouseLocation.y);
+				canvasContext.strokeStyle = draftingLineColor;
+				canvasContext.lineJoin = "round";
+				canvasContext.lineCap = "round";
+				canvasContext.lineWidth = 1;
+				canvasContext.beginPath();
+				canvasContext.moveTo(mouseLocation.x, mouseLocation.y);
 			};
 
-			canvasSelected.onmousemove = function(e) {
+			canvasDOM.onmousemove = function(e) {
 				if(painting) {
 					const mouseLocation = L.point(e.pageX - this.offsetLeft,
 					                              e.pageY - this.offsetTop);
 
+					// Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
+					const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
+					const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(distanceThreshold);
+
 					// If greater than the distance criteria, draw set length lines towards current mouse location until too close
 					while(mouseLocation.distanceTo(lineCoordinates[lineCoordinates.length - 1]) >= distanceThreshold){
-						const lastPoint = lineCoordinates[lineCoordinates.length - 1];
+						// Interpolate a point distanceThreshold units away from the last point (final bit of: https://math.stackexchange.com/a/175906)
+						const interpolatedPoint = du.add(lineCoordinates[lineCoordinates.length - 1]);
 
-						// Interpolate a point distanceThreshold units away from the last point (using: https://math.stackexchange.com/a/175906)
-						const v = mouseLocation.subtract(lastPoint);
-						const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(distanceThreshold);
-						const interpolatedPoint = du.add(lastPoint);
-						
 						// Add the interpolated point to the list
 						lineCoordinates.push(interpolatedPoint);
 						
 						// Draw the next line segment
-						context.lineTo(interpolatedPoint.x, interpolatedPoint.y);
-						context.stroke();
+						canvasContext.lineTo(interpolatedPoint.x, interpolatedPoint.y);
+						canvasContext.stroke();
 					}
 				}
 			};
 
-			canvasSelected.onmouseup = function(e) {
+			canvasDOM.onmouseup = function(e) {
 				// Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
 				const coordinates = lineCoordinates.map((point) => {
 					return mymap.containerPointToLatLng(point);
@@ -149,8 +163,8 @@
 				playTones(normalizeToMidiNotes(24,84,elevations), 8);
 
 				// Reset canvas painting stuff
-				context.closePath();
-				context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+				canvasContext.closePath();
+				canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height); // Clears the canvas
 				painting = false;
 				lineCoordinates = [];
 			};
@@ -176,10 +190,10 @@
 
 				//Next, apply a similar procedure to get midi notes, except this time with rounding bc midi notes are ints
 				let midiNotes = [];
+
 				//We don't need to find min and max, they are 0 and 100 by definition
 				elevations100.forEach(function(x) {
 				    let preRoundNote = ((x/100) * (noteMax - noteMin)) + noteMin;
-				    console.log("pre round note:", preRoundNote);
 				    midiNotes.push(Math.round(preRoundNote));
 				});
 

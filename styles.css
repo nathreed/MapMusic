@@ -4,7 +4,31 @@ html, body {
 	border: 0;
 }
 
-#drawing{
+/* General layout stuff */
+#wholeUIContainer {
+	display: grid;
+	grid-template-columns: 1fr 300px;
+	grid-template-rows: auto 3fr 2fr;
+	grid-template-areas: 
+		"mapToolbar audioControls"
+		"mapContainer audioControls"
+		"loopEditor loopEditor";
+	width: 100vw;
+	height: 100vh;
+}
+
+/* Map UI stuff */
+#mapToolbar {
+	grid-area: mapToolbar;
+	background-color: #3D3D3D;
+	color: #FFFFFF;
+}
+
+#mapContainer {
+	grid-area: mapContainer;
+}
+
+#drawingLayer {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -12,10 +36,21 @@ html, body {
 	height: 100%;
 	z-index: 999;
 }
-#mapid{
+
+#mapLayer {
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100vw;
-	height: 100vh;
+	right: 0;
+	bottom: 0;
+}
+
+/* Audio controls stuff */
+#audioControlsContainer {
+	grid-area: audioControls;
+}
+
+/* Loop editor stuff */
+#loopEditorContainer {
+	grid-area: loopEditor;
 }
