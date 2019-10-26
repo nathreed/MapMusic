@@ -11,6 +11,8 @@
 	integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
 	crossorigin=""></script>
 	<script src="leaflet-tilelayer-colorpicker.js"></script>
+	<script src = "https://cdnjs.cloudflare.com/ajax/libs/tone/13.0.1/Tone.min.js" ></script>
+	<script src = "music-gen.js"></script>
 
 
 </head>
@@ -138,12 +140,51 @@
 				pathsAsElevations.push(elevations);
 				pathsAsCoordinates.push(coordinates);
 
+				//TEST: normalize elevations and print
+				console.log("**TESTING**");
+				console.log(elevations);
+				console.log(normalizeElevations100(elevations));
+				console.log(normalizeToMidiNotes(24, 84, elevations));
+				//Test play tones
+				playTones(normalizeToMidiNotes(24,84,elevations), 8);
+
 				// Reset canvas painting stuff
 				context.closePath();
 				context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
 				painting = false;
 				lineCoordinates = [];
 			};
+
+			function normalizeElevations100(pathElevation) {
+			    //We take the array of elevations and we map them onto a 0-100 scale
+				//Simple idea for now: We just make their value be the % of the max they are
+				let max = Math.max.apply(null, pathElevation);
+				let min = Math.min.apply(null, pathElevation);
+				console.log("MIN:", min);
+				console.log("MAX:", max);
+
+				let normalizedElevations = [];
+				pathElevation.forEach(function(x) {
+				    normalizedElevations.push(((x-min)/(max-min))*100);
+				});
+				return normalizedElevations;
+			}
+
+			function normalizeToMidiNotes(noteMin, noteMax, elevations) {
+			    //First normalize the elevations to the 100 scale
+				let elevations100 = normalizeElevations100(elevations);
+
+				//Next, apply a similar procedure to get midi notes, except this time with rounding bc midi notes are ints
+				let midiNotes = [];
+				//We don't need to find min and max, they are 0 and 100 by definition
+				elevations100.forEach(function(x) {
+				    let preRoundNote = ((x/100) * (noteMax - noteMin)) + noteMin;
+				    console.log("pre round note:", preRoundNote);
+				    midiNotes.push(Math.round(preRoundNote));
+				});
+
+				return midiNotes;
+			}
 
 		</script>
 	</body>
