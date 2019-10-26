@@ -75,5 +75,5 @@ html, body {
 #loopEditorContainer {
 	grid-area: loopEditor;
 	max-height: 50vh;
-	overflow: scroll;
+	overflow: auto;
 }
