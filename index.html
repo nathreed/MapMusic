@@ -9,39 +9,93 @@
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
-</head>
-<body>
-    <div id="mapid" style="height: 500px; width: 100%;"></div>
-    <script>
-        let night = false;
+    <script   src="https://code.jquery.com/jquery-3.4.1.min.js"   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="   crossorigin="anonymous"></script>
 
+</head>
+<body style="height:100%;">
+    <!--<div id="mapid" style="height: 100vh; width: 100vw;"></div>-->
+    <canvas id="drawing" style="height: 100vh; width: 100vw; z-index: 999"></canvas>
+
+
+    <!--<script>
         // Map Settings
         const center = [43.12861, -77.630081];
-        const myLocationMarkerOptions = {
-            weight: 3,
-            color: '#fff',
-            radius: 5,
-            fillColor: '#009dff',
-            fillOpacity: 1.0
-        };
-
         // Variable storing location so no stutter when starting again
         let lastLocation = null;
-
         // Map initialization
         let mymap = L.map('mapid').setView(center, 16);
-        let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
-
+        //let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
         // Mapbox map layer layer
         let accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
         let mapboxURL = "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}";
 
         let outdoors = L.tileLayer(mapboxURL, {
-            id: 'mapbox.outdoors-v9', attribution: '', maxZoom: 20, accessToken: accessToken
+            id: 'outdoors-v9', attribution: '', maxZoom: 20, accessToken: accessToken
         });
         outdoors.addTo(mymap);
+        mymap.dragging.disable(); //disable drag for now
 
-        myLocationMarker.addTo(mymap);
+       // myLocationMarker.addTo(mymap);
+    </script>-->
+    <script>
+        let context = document.getElementById("drawing").getContext("2d");
+        let paint = false;
+
+        let canvasSelected = $("drawing");
+        canvasSelected.mousedown(function(e) {
+            let mouseX = e.pageX - this.offsetLeft;
+            let mouseY = e.pageY - this.offsetTop;
+
+            paint = true;
+            addClick(mouseX, mouseY);
+            redraw();
+        });
+
+        canvasSelected.mousemove(function(e) {
+            if(paint) {
+                let mouseX = e.pageX - this.offsetLeft;
+                let mouseY = e.pageY - this.offsetTop;
+                addClick(mouseX, mouseY, true);
+            }
+        });
+
+        canvasSelected.mouseup(function(e) {
+            paint = false;
+        });
+
+
+        let clickX = [];
+        let clickY = [];
+        let clickDrag = [];
+
+        function addClick(x, y, dragging) {
+            //todo add complicated data-cleaning logic here
+            clickX.push(x);
+            clickY.push(y);
+            clickDrag.push(dragging);
+            console.log("add click")
+        }
+
+        function redraw(){
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+
+            context.strokeStyle = "#df4b26";
+            context.lineJoin = "round";
+            context.lineWidth = 5;
+
+            for(var i=0; i < clickX.length; i++) {
+                context.beginPath();
+                if(clickDrag[i] && i){
+                    context.moveTo(clickX[i-1], clickY[i-1]);
+                }else{
+                    context.moveTo(clickX[i]-1, clickY[i]);
+                }
+                context.lineTo(clickX[i], clickY[i]);
+                context.closePath();
+                context.stroke();
+            }
+        }
+
 
     </script>
 </body>
