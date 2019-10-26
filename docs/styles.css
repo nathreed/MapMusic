@@ -73,6 +73,5 @@ html, body {
 
 /* Loop editor stuff */
 #loopEditorContainer {
-	background-color: lightblue;
 	grid-area: loopEditor;
 }

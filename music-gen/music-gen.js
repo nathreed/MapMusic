@@ -1,4 +1,6 @@
 const Tone = require("tone");
+//const toWav = require("audiobuffer-to-wav");
+const toWav = require("./wav-export").wavFromBuffer;
 //NOTE: Tone.js should be included in the HTML before this file
 function midi(note) {
     return new Tone.Frequency(note, "midi");
@@ -31,31 +33,30 @@ function playTones(midiNotes, totalPlayTime) {
     //Tone.Transport.clear(seq)
 }
 
-function renderOffline(midiNotes, totalPlayTime) {
+//Callback will be called with a blob of the wav of the rendered audio
+function renderOffline(midiNotes, totalPlayTime, callback) {
     Tone.Offline(function() {
-        playTones(midiNotes, totalPlayTime); //does this work?
-        /*Tone.Transport.stop();
-        let synth = new Tone.Synth().toMaster();
-
-        Tone.Transport._timeline.forEach(function(x) {
-            Tone.Transport._timeline.remove(x);
-        });
-
-        synth.triggerAttackRelease("C2", "4n");*/
-
+        playTones(midiNotes, totalPlayTime);
     }, totalPlayTime).then(function(buffer) {
         //Do something with output buffer
         console.log("OFFLINE RENDER OUTPUT:");
         console.log(buffer);
 
+        let wavBlob = toWav(buffer);
+        /*let blob = new window.Blob([ new DataView(wav) ], {
+            type: 'audio/wav'
+        });*/
 
+        /*let anchor = document.createElement('a');
+        document.body.appendChild(anchor);
+        anchor.style = 'display: none';
+        let url = window.URL.createObjectURL(wavBlob);
+        anchor.href = url;
+        anchor.download = 'audio.wav';
+        anchor.click();
+        window.URL.revokeObjectURL(url);*/
 
-        setTimeout(function() {
-            let player = new Tone.Player(buffer).toMaster();
-            console.log("STARTING PLAYER ON OFFLINE BUFFER!");
-            player.start();
-
-        }, 10000)
+        callback(wavBlob);
     })
 }
 

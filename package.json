@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "browserify": "rm -rf docs/dist && mkdir docs/dist && browserify index.js > docs/dist/index.js"
+    "browserify": "rm -rf docs/dist && mkdir docs/dist && browserify index.js > docs/dist/index.js",
+    "sass": "sass node_modules/waveform-playlist/styles/playlist.scss docs/dist/playlist.css"
   },
   "repository": {
     "type": "git",

@@ -8,6 +8,7 @@
   },
   "author": "",
   "dependencies": {
+    "audiobuffer-to-wav": "^1.0.0",
     "tone": "^13.8.25"
   }
 }

@@ -2,6 +2,7 @@ const L = require("leaflet");
 require("leaflet-tilelayer-colorpicker");
 const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
+//the styles for waveform-playlist are included separately and compiled in a separate step
 
 // Map toolbar handling
 let savedPlaces = [
@@ -137,7 +138,7 @@ canvasDOM.onmousemove = function(e) {
 
 canvasDOM.onmouseup = function(e) {
     // Check if there are enough points to do audio stuff
-    if(lineCoordinates.length >= 2){
+    if(lineCoordinates.length >= 2) {
         // Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
         const coordinates = lineCoordinates.map((point) => {
             return mymap.containerPointToLatLng(point);
@@ -149,7 +150,7 @@ canvasDOM.onmouseup = function(e) {
         // Points to elevation data
         const elevations = coordinates.map((point) => {
             const color = elevationData.getColor(point);
-            if(color !== null){
+            if (color !== null) {
                 // Convert the RGB channels to one hex number then scale to mapbox elevation data
                 return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
             } else {
@@ -162,11 +163,20 @@ canvasDOM.onmouseup = function(e) {
         pathsAsCoordinates.push(coordinates);
 
         //TEST: normalize elevations and print
-        console.log("normalizeToMidiNotes:");
+        console.log("**TESTING**");
+        console.log(elevations);
+        console.log(normalizeElevations100(elevations));
         console.log(normalizeToMidiNotes(24, 84, elevations));
         //Test play tones
-        Music.playTones(normalizeToMidiNotes(24,84,elevations), 8);
-        Music.renderOffline(normalizeToMidiNotes(24,84,elevations), 8);
+        Music.playTones(normalizeToMidiNotes(24, 84, elevations), 8);
+        Music.renderOffline(normalizeToMidiNotes(24, 84, elevations), 8, function (blob) {
+            console.log("blob callback, blob:", blob);
+            playlist.load([{
+                src: blob,
+                name: "MapSound",
+                gain: 0.5
+            }]);
+        });
     }
 
     // Reset canvas painting stuff
@@ -224,6 +234,15 @@ let playlist = WaveformPlaylist.init({
         width: 200
     },
     zoomLevels: [500, 1000, 3000, 5000]
+});
+playlist.load([
+    {
+        src: "suv-godbless.mp3",
+        name: "SUV",
+        gain: 0.5
+    }
+]).then(function() {
+    console.log("playlist loaded shit");
 });
 console.log("added playlist");
 
