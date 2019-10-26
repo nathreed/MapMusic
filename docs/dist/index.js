@@ -51,6 +51,8 @@ mapToolbarChildren.saveLocationButton.onclick = function(e){
     } else {
         // Adding current location to presets list
         addPlaceToPresetsDOM({name: newPlaceName, coordinates: mymap.getCenter(), zoom: mymap.getZoom()}, savedPlaces.length);
+        mapToolbarChildren.saveLocationName.value = "";
+        mapToolbarChildren.locationSelect.value = savedPlaces.length - 1;
     }
 };
 
@@ -175,13 +177,7 @@ canvasDOM.onmouseup = function(e) {
         // Add elevation data and path to arrays
         pathsAsElevations.push(elevations);
         pathsAsCoordinates.push(coordinates);
-
-        //TEST: normalize elevations and print
-        //console.log("**TESTING**");
-        //console.log(elevations);
-        //console.log(normalizeElevations100(elevations));
-        //console.log(normalizeToMidiNotes(24, 84, elevations));
-        //Test play tones
+        
         Music.playTones(normalizeToMidiNotes(24, 84, elevations), 8);
         Music.renderOffline(normalizeToMidiNotes(24, 84, elevations), 8, function (blob) {
             console.log("blob callback, blob:", blob);
@@ -265,7 +261,7 @@ PLAYLIST EVENT CONTROL BELOW HERE
  */
 
 let ee = playlist.getEventEmitter();
-let  $container = $("body");
+let $container = $("body");
 let startTime = 0;
 let endTime = 0;
 let audioPos = 0;
@@ -339,7 +335,30 @@ $container.on("click", ".btn-download", function () {
     ee.emit('startaudiorendering', 'wav');
 });
 
+// Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
+function interpolateArray(data, newLength) {
+    const indexScalar = (data.length - 1) / (newLength - 1);
+    let resultData = [];
 
+    // Set the first value to be the same
+    resultData[0] = data[0];
+
+    // For each new index
+    for (let i = 1; i < newLength - 1; i++) {
+        // Figure out how far through the original data it is (and which two datapoints are on either side of it)
+        let howFar = i * indexScalar;
+        let beforeIndex = Math.floor(howFar);
+        let afterIndex = Math.ceil(howFar);
+
+        // Save the value interpolated that far in ()
+        resultData[i] = ((before, after, atPoint) => {return before + (after - before) * atPoint;})(data[beforeIndex], data[afterIndex], howFar - beforeIndex);
+    }
+
+    // Set the last value to be the same
+    resultData[newLength - 1] = data[data.length - 1];
+
+    return resultData;
+}
 
 },{"./music-gen":2,"leaflet":32,"leaflet-tilelayer-colorpicker":31,"waveform-playlist":75}],2:[function(require,module,exports){
 const Tone = require("tone");

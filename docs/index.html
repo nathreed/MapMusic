@@ -14,8 +14,8 @@
 			<div id="mapContainer">
 				<div id="mapToolbar" class="containerPadded">
 					Select mode:
-					<input type="radio" name="mode" id="panningMode" value="panning" checked><label for="panningMode">Panning</label>
-					<input type="radio" name="mode" id="drawingMode" value="drawing"><label for="drawingMode">Drawing</label>
+					<input type="radio" name="mode" id="panningMode" value="panning" checked><label for="panningMode" class="radioButton" >Panning</label>
+					<input type="radio" name="mode" id="drawingMode"value="drawing"><label for="drawingMode" class="radioButton" >Drawing</label>
 					&emsp;
 					Load a location:
 					<select name="locationSelect">
@@ -23,14 +23,40 @@
 					&emsp;
 					Bookmark current location:
 					<input type="text" name="saveLocationName" placeholder="Location Save Name">
-					<button type="button" name="saveLocationButton">Save</button>
+					<input type="button" name="saveLocationButton" value="Save">
 				</div>
 				<div id="mapWrapper">
 					<canvas id="drawingLayer" class="noInteraction"></canvas>
 					<div id="mapLayer"></div>
 				</div>
 			</div>
-			<div id="audioControlsContainer" class="containerPadded">Hi! I'm the audio controls</div>
+			<div id="audioControlsContainer" class="containerPadded">
+				Settings Selection:
+				<select name="settingsPaneSelector">
+					<option value="interpolation" selected>Interpolation</option>
+					<option value="something">Something else</option>
+				</select>
+				<br>
+				Sound name:
+				<input type="text" name="soundName">
+				<div id="audioInterpolationContainer">
+					Low note:
+					<input type="number" name="lowNote" value="24">
+					<br>
+					High note:
+					<input type="number" name="highNote" value="84">
+					<br>
+					Audio length editing mode:
+					<select name="audioLengthScalingMode">
+						<option value="totalLength">Total length</option>
+						<option value="noteDuration">Note duration</option>
+					</select>
+					<br>
+					Sampling rate:
+					
+					
+				</div>
+			</div>
 			<div id="loopEditorWrapper" class="containerPadded">
 				<div id="editorToolbarContainer">
 					<input type="button" value="Play" class="btn-play">
@@ -54,7 +80,8 @@
 			</div>
 		</div>
 
-		<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		<script src="jquery-ui.min.js"></script>
 		<script src="dist/index.js"></script>
 	</body>
 </html>

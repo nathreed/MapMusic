@@ -3,13 +3,15 @@ html, body {
 	padding: 0;
 	border: 0;
 	font-family: sans-serif;
+	font-size: 13px;
+	color: #eeeeee;
 }
 
 /* General layout stuff */
 #wholeUIContainer {
 	display: grid;
 	align-items: stretch;
-	grid-template-columns: 1fr 300px;
+	grid-template-columns: 5fr 1fr;
 	grid-template-rows: 3fr 2fr;
 	grid-gap: 5px;
 	padding: 5px;
@@ -34,19 +36,52 @@ html, body {
 
 /* Map UI stuff */
 #mapToolbar {
-	color: #FFFFFF;
 }
 
 /* Style the radio selectors as buttons */
+.radioButton {
+	padding: 5px 7px;
+	border-radius: 500px;
+	color: #eeeeee;
+	font-size: 13px;
+	cursor: pointer;
+}
 #mapToolbar input[type="radio"] {
 	display: none;
 }
-#mapToolbar input[type="radio"] + label {
-	padding: 2px;
-	border-radius: 5px;
-}
-#mapToolbar input[type="radio"]:checked + label {
+
+#mapToolbar input[type="radio"]:checked + .radioButton {
 	border: 2px solid #aaaaaa;
+}
+
+/* Style text input well */
+input[type="text"] {
+	background-color: transparent;
+	border: none;
+	color: #eeeeee;
+	border-bottom: 2px solid #eeeeee;
+}
+
+/* Button styling */
+input[type="button"] {
+	background-color: transparent;
+	padding: 5px 7px;
+	border-radius: 500px;
+	color: #eeeeee;
+	font-size: 13px;
+	border: 2px solid #aaaaaa;
+	cursor: pointer;
+}
+
+input[type="button"]:active, .radioButton:active {
+	color: #ffffff;
+	border: 2px solid #ffffff;
+	background-color: #303030;
+}
+
+input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radioButton:focus {
+	color: #ffffff;
+	border: 2px solid #ffffff;
 }
 
 /* Used for disabling the canvas layer */
@@ -98,3 +133,4 @@ html, body {
 	max-height: 50vh;
 	overflow: auto;
 }
+
