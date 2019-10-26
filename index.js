@@ -30,10 +30,10 @@ mapToolbarChildren.saveLocationButton.onclick = function(e){
     // Check if the name is already used in the places array
     let newPlaceName = mapToolbarChildren.saveLocationName.value;
     if(newPlaceName === "" || savedPlaces.reduce((accumulator, place) => {return accumulator || place.name === newPlaceName}, false)){
-        console.log("trying to add an already used name");
+        console.log("trying to add an already used name, or name not specified.");
     } else {
         // Adding current location to presets list
-        addPlaceToPresetsDOM({name: newPlaceName, coordinates: mymap.getCenter(), zoom: mymap.getZoom()});
+        addPlaceToPresetsDOM({name: newPlaceName, coordinates: mymap.getCenter(), zoom: mymap.getZoom()}, savedPlaces.length);
     }
 };
 
@@ -136,35 +136,38 @@ canvasDOM.onmousemove = function(e) {
 };
 
 canvasDOM.onmouseup = function(e) {
-    // Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
-    const coordinates = lineCoordinates.map((point) => {
-        return mymap.containerPointToLatLng(point);
-    });
+    // Check if there are enough points to do audio stuff
+    if(lineCoordinates.length >= 2){
+        // Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
+        const coordinates = lineCoordinates.map((point) => {
+            return mymap.containerPointToLatLng(point);
+        });
 
-    // Add GeoJSON to the map (and store the path in the polylines list)
-    pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
+        // Add GeoJSON to the map (and store the path in the polylines list)
+        pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
 
-    // Points to elevation data
-    const elevations = coordinates.map((point) => {
-        const color = elevationData.getColor(point);
-        if(color !== null){
-            // Convert the RGB channels to one hex number then scale to mapbox elevation data
-            return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
-        } else {
-            console.log("crap, coordinates at " + point + " aren't color-elevation-readable.");
-        }
-    });
+        // Points to elevation data
+        const elevations = coordinates.map((point) => {
+            const color = elevationData.getColor(point);
+            if(color !== null){
+                // Convert the RGB channels to one hex number then scale to mapbox elevation data
+                return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
+            } else {
+                console.log("crap, coordinates at " + point + " aren't color-elevation-readable.");
+            }
+        });
 
-    // Add elevation data and path to arrays
-    pathsAsElevations.push(elevations);
-    pathsAsCoordinates.push(coordinates);
+        // Add elevation data and path to arrays
+        pathsAsElevations.push(elevations);
+        pathsAsCoordinates.push(coordinates);
 
-    //TEST: normalize elevations and print
-    console.log("normalizeToMidiNotes:");
-    console.log(normalizeToMidiNotes(24, 84, elevations));
-    //Test play tones
-    Music.playTones(normalizeToMidiNotes(24,84,elevations), 8);
-    Music.renderOffline(normalizeToMidiNotes(24,84,elevations), 8);
+        //TEST: normalize elevations and print
+        console.log("normalizeToMidiNotes:");
+        console.log(normalizeToMidiNotes(24, 84, elevations));
+        //Test play tones
+        Music.playTones(normalizeToMidiNotes(24,84,elevations), 8);
+        Music.renderOffline(normalizeToMidiNotes(24,84,elevations), 8);
+    }
 
     // Reset canvas painting stuff
     canvasContext.closePath();
