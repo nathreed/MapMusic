@@ -5,3 +5,20 @@ Drawing mode, panning mode
 	Draw in transparent canvas
 	Pass data through L.containerPointToLatLng(<Point> point) to the map
 	
+   Use map.dragging.disable when we are drawing on canvas
+   
+   
+## Mapping Elevation to Pitch
+Main idea: lower elevation = lower pitch, higher elevation = higher pitch
+
+Elevation info will be normalized on a per-line basis, let's say in the range of 0-100. 
+So we will take this 0-100 number and map it onto the musical scale between C1 and C6
+(midi 24-84). 
+
+
+## Tools/Effects
+
+- pitch: elevation maps to pitch and generates music (see above)
+- volume: elevation maps to volume levels (easy mapping 0-100%) and modifies existing track
+- pitch warp: elevation maps to pitch warp factor (similar as above) and modifies existing track
+- CA$H MONEY: fun UI to determine how much money to bank transfer!
