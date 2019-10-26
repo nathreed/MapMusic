@@ -21,105 +21,130 @@
 		</div>
 
 		<script>
-			// Map Settings
-			const center = [43.12861, -77.630081];
-			// Variable storing location so no stutter when starting again
-			let lastLocation = null;
+			// Map settings
+			const startCenter = [43.12861, -77.630081];
+			const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
+			const urlRGBheight = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";
+			const accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+
 			// Map initialization
-			let mymap = L.map('map').setView(center, 16);
-			//let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
-			// Mapbox map layer layer
-			let accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
-			let mapboxURL = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
+			let mymap = L.map("map").setView(startCenter, 16);
+			
+			// Mapbox map layers
+			let terrainVisible = L.tileLayer(urlTerrain, {
+				attribution: "",
+				minZoom: 0,
+				maxZoom: 18,
+				accessToken: accessToken
+			}).addTo(mymap);
 
-			let outdoors = L.tileLayer(mapboxURL, {
-				attribution: '', maxZoom: 18, accessToken: accessToken
-			});
-
-
-            let mapboxRGBURL = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token=" + accessToken;
-            let colorpicker = L.tileLayer.colorPicker(mapboxRGBURL, {
-                attribution: ">",
-                minZoom: 0,
-                maxZoom: 18,
-                maxNativeZoom: 14,
-                opacity: 0.0
-            }).addTo(mymap);
-
-            outdoors.addTo(mymap);
+			let elevationData = L.tileLayer.colorPicker(urlRGBheight, {
+				attribution: "",
+				minZoom: 0,
+				maxZoom: 18,
+				maxNativeZoom: 14,
+				opacity: 0.0,
+				accessToken: accessToken
+			}).addTo(mymap);
 
 
-            //mymap.dragging.disable(); //disable drag for now
-		</script>
-		<script>
+      //mymap.dragging.disable(); //disable drag for now
+
+      // Data for the paths
+      pathsAsCoordinates = [];
+      pathsAsPolylines = []
+      pathsAsElevations = [];
+
 			let canvasSelected = document.getElementById("drawing");
 			let context = canvasSelected.getContext("2d");
 
-			// TODO Reactively
+			// Update canvas coordinate system
 			canvasSelected.width = window.innerWidth;
 			canvasSelected.height = window.innerHeight;
+			window.onresize = function(e){
+				canvasSelected.width = window.innerWidth;
+				canvasSelected.height = window.innerHeight;
+			};
 
 			// Drawing code
-			let paint = false;
-			let clickX = [];
-			let clickY = [];
+			const draftingLineColor = "#737561";
+			const setLineColor = "#464738";
+			let painting = false;
+			let lineCoordinates = [];
 			const distanceThreshold = 5;
 
 			canvasSelected.onmousedown = function(e) {
-				paint = true;
-				const mouseX = e.pageX - this.offsetLeft;
-				const mouseY = e.pageY - this.offsetTop;
+				console.log("hi");
+				painting = true;
+				const mouseLocation = L.point(e.pageX - this.offsetLeft,
+				                              e.pageY - this.offsetTop);
 				
-				addClick(mouseX, mouseY);
-				redraw();
+				lineCoordinates.push(mouseLocation);
+				
+				// Start drawing a line
+				context.strokeStyle = draftingLineColor;
+				context.lineJoin = "round";
+				context.lineCap = "round";
+				context.lineWidth = 1;
+				context.beginPath();
+				context.moveTo(mouseLocation.x, mouseLocation.y);
 			};
 
 			canvasSelected.onmousemove = function(e) {
-				if(paint) {
-					const mouseX = e.pageX - this.offsetLeft;
-					const mouseY = e.pageY - this.offsetTop;
+				if(painting) {
+					const mouseLocation = L.point(e.pageX - this.offsetLeft,
+					                              e.pageY - this.offsetTop);
 
-					// If meeting the distance criteria,
-					if(dist(mouseX, mouseY, clickX[clickX.length - 1], clickY[clickY.length - 1]) >= distanceThreshold){
-						addClick(mouseX, mouseY);
-						redraw();
+					// If greater than the distance criteria, draw set length lines towards current mouse location until too close
+					while(mouseLocation.distanceTo(lineCoordinates[lineCoordinates.length - 1]) >= distanceThreshold){
+						const lastPoint = lineCoordinates[lineCoordinates.length - 1];
+
+						// Interpolate a point distanceThreshold units away from the last point (using: https://math.stackexchange.com/a/175906)
+						const v = mouseLocation.subtract(lastPoint);
+						const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(distanceThreshold);
+						const interpolatedPoint = du.add(lastPoint);
+						
+						// Add the interpolated point to the list
+						lineCoordinates.push(interpolatedPoint);
+						
+						// Draw the next line segment
+						context.lineTo(interpolatedPoint.x, interpolatedPoint.y);
+						context.stroke();
 					}
 				}
 			};
 
 			canvasSelected.onmouseup = function(e) {
-				paint = false;
-				// TODO Convert to leaflet object
-				clickX = [];
-				clickY = [];
+				// Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
+				const coordinates = lineCoordinates.map((point) => {
+					return mymap.containerPointToLatLng(point);
+				});
+
+				// Add GeoJSON to the map (and store the path in the polylines list)
+				pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
+
+				// Points to elevation data
+				const elevations = coordinates.map((point) => {
+					const color = elevationData.getColor(point);
+					if(color !== null){
+						// Convert the RGB channels to one hex number then scale to mapbox elevation data
+						return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
+					} else {
+						console.log("crap, coordinates at " + point + " aren't color-readable.");
+					}
+				});
+
+				// Add elevation data and path to arrays
+				pathsAsElevations.push(elevations);
+				pathsAsCoordinates.push(coordinates);
+
+				// Reset canvas painting stuff
+				context.closePath();
+				context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+				painting = false;
+				lineCoordinates = [];
 			};
 
-
-			function addClick(x, y) {
-				//todo add complicated data-cleaning logic here
-				clickX.push(x);
-				clickY.push(y);
-			}
-
-			function redraw(){
-				context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
-
-				context.strokeStyle = "#df4b26";
-				context.lineJoin = "round";
-				context.lineWidth = 5;
-
-				context.beginPath();
-				context.moveTo(clickX[0], clickY[0]);
-				for(let i = 1; i < clickX.length; i++) {
-					context.lineTo(clickX[i], clickY[i]);
-				}
-				context.stroke();
-				context.closePath();
-			}
-
-			function dist(x1, y1, x2, y2) {
-				return Math.hypot(x1 - x2, y1 + y2);
-			}
 		</script>
 	</body>
 </html>
