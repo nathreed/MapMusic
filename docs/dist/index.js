@@ -177,10 +177,10 @@ canvasDOM.onmouseup = function(e) {
         pathsAsCoordinates.push(coordinates);
 
         //TEST: normalize elevations and print
-        console.log("**TESTING**");
-        console.log(elevations);
-        console.log(normalizeElevations100(elevations));
-        console.log(normalizeToMidiNotes(24, 84, elevations));
+        //console.log("**TESTING**");
+        //console.log(elevations);
+        //console.log(normalizeElevations100(elevations));
+        //console.log(normalizeToMidiNotes(24, 84, elevations));
         //Test play tones
         Music.playTones(normalizeToMidiNotes(24, 84, elevations), 8);
         Music.renderOffline(normalizeToMidiNotes(24, 84, elevations), 8, function (blob) {
@@ -260,20 +260,86 @@ playlist.load([
 });
 console.log("added playlist");
 
-function playlistPlay() {
-    playlist.play()
+/*
+PLAYLIST EVENT CONTROL BELOW HERE
+ */
+
+let ee = playlist.getEventEmitter();
+let  $container = $("body");
+let startTime = 0;
+let endTime = 0;
+let audioPos = 0;
+let isLooping = false;
+let playoutPromises;
+
+function toggleActive(node) {
+    let active = node.parentNode.querySelectorAll('.active');
+    let i = 0, len = active.length;
+
+    for (; i < len; i++) {
+        active[i].classList.remove('active');
+    }
+
+    node.classList.toggle('active');
 }
 
-function playlistPause() {
-    playlist.pause()
+function updateSelect(start, end) {
+    if (start < end) {
+        $('.btn-trim-audio').removeClass('disabled');
+    }
+    else {
+        $('.btn-trim-audio').addClass('disabled');
+    }
+
+    startTime = start;
+    endTime = end;
 }
 
-function playlistStop() {
-    playlist.stop();
-}
-document.getElementById("playbutton").onclick = playlistPlay;
-document.getElementById("pausebutton").onclick = playlistPause;
-document.getElementById("stopbutton").onclick = playlistStop;
+updateSelect(startTime, endTime);
+
+$container.on("click", ".btn-play", function() {
+    ee.emit("play");
+});
+
+$container.on("click", ".btn-pause", function() {
+    isLooping = false;
+    ee.emit("pause");
+});
+
+$container.on("click", ".btn-stop", function() {
+    isLooping = false;
+    ee.emit("stop");
+});
+
+$container.on("click", ".btn-clear", function() {
+    isLooping = false;
+    ee.emit("clear");
+});
+
+$container.on("click", ".btn-cursor", function() {
+    ee.emit("statechange", "cursor");
+    toggleActive(this);
+});
+
+$container.on("click", ".btn-select", function() {
+    ee.emit("statechange", "select");
+    toggleActive(this);
+});
+
+$container.on("click", ".btn-shift", function() {
+    ee.emit("statechange", "shift");
+    toggleActive(this);
+});
+
+$container.on("click", ".btn-trim-audio", function() {
+    ee.emit("trim");
+});
+
+$container.on("click", ".btn-download", function () {
+    ee.emit('startaudiorendering', 'wav');
+});
+
+
 
 },{"./music-gen":2,"leaflet":32,"leaflet-tilelayer-colorpicker":31,"waveform-playlist":75}],2:[function(require,module,exports){
 const Tone = require("tone");
