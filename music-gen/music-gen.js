@@ -1,3 +1,4 @@
+const Tone = require("tone");
 //NOTE: Tone.js should be included in the HTML before this file
 function midi(note) {
     return new Tone.Frequency(note, "midi");
@@ -73,3 +74,8 @@ function renderOffline(midiNotes, totalPlayTime) {
         }, 10000)
     })
 }
+
+module.exports = {
+    playTones: playTones,
+    renderOffline: renderOffline
+};

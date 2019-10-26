@@ -1,5 +1,5 @@
 #!/bin/bash
 
-rm -rf dist
-mkdir dist
-browserify index.js > dist/index.js
+rm -rf gh-pages/dist
+mkdir gh-pages/dist
+browserify index.js > gh-pages/dist/index.js

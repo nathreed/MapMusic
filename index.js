@@ -1,5 +1,7 @@
 let L = require("leaflet");
 require("leaflet-tilelayer-colorpicker");
+let Music = require("./music-gen");
+console.log(Music);
 
 // Map toolbar handling
 let savedPlaces = [
@@ -11,8 +13,6 @@ let savedPlaces = [
     {name: "Shenandoah River", coordinates: [38.8943634, -78.4618465], zoom: 13},
     {name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
 ];
-// Add the saved places to the toolbar select
-
 
 // Map settings
 const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
@@ -137,8 +137,8 @@ canvasDOM.onmouseup = function(e) {
     console.log(normalizeElevations100(elevations));
     console.log(normalizeToMidiNotes(24, 84, elevations));
     //Test play tones
-    playTones(normalizeToMidiNotes(24,84,elevations), 8);
-    renderOffline(normalizeToMidiNotes(24,84,elevations), 8);
+    Music.playTones(normalizeToMidiNotes(24,84,elevations), 8);
+    Music.renderOffline(normalizeToMidiNotes(24,84,elevations), 8);
 
     // Reset canvas painting stuff
     canvasContext.closePath();
