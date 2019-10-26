@@ -93,7 +93,7 @@ html, body {
 }
 
 /* Loop editor stuff */
-#loopEditorContainer {
+#loopEditorWrapper {
 	grid-area: loopEditor;
 	max-height: 50vh;
 	overflow: auto;

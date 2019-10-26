@@ -259,3 +259,17 @@ playlist.load([
 });
 console.log("added playlist");
 
+function playlistPlay() {
+    playlist.play()
+}
+
+function playlistPause() {
+    playlist.pause()
+}
+
+function playlistStop() {
+    playlist.stop();
+}
+document.getElementById("playbutton").onclick = playlistPlay;
+document.getElementById("pausebutton").onclick = playlistPause;
+document.getElementById("stopbutton").onclick = playlistStop;
