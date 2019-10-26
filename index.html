@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map Music</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+            integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+            crossorigin=""></script>
+</head>
+<body>
+    <div id="mapid" style="height: 500px; width: 100%;"></div>
+    <script>
+        let night = false;
+
+        // Map Settings
+        const center = [43.12861, -77.630081];
+        const myLocationMarkerOptions = {
+            weight: 3,
+            color: '#fff',
+            radius: 5,
+            fillColor: '#009dff',
+            fillOpacity: 1.0
+        };
+
+        // Variable storing location so no stutter when starting again
+        let lastLocation = null;
+
+        // Map initialization
+        let mymap = L.map('mapid').setView(center, 16);
+        let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
+
+        // Mapbox map layer layer
+        let accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+        let mapboxURL = "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}";
+
+        let outdoors = L.tileLayer(mapboxURL, {
+            id: 'mapbox.outdoors-v9', attribution: '', maxZoom: 20, accessToken: accessToken
+        });
+        outdoors.addTo(mymap);
+
+        myLocationMarker.addTo(mymap);
+
+    </script>
+</body>
+</html>
