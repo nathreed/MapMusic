@@ -18,7 +18,15 @@
 </head>
 	<body>
 		<div id="wholeUIContainer">
-			<div id="mapToolbar">Hi! I'm the map toolbar</div>
+			<div id="mapToolbar">
+				Hi! I'm the map toolbar
+				<input name="mode" type="radio" value="male">
+				<select name="locationSelect">
+					<option value="0">Grand Canyon</option>
+				</select> 
+				<button type="button" onclick="alert('Hello World!')">Save Location</button>
+				<input type="text" name="saveLocationName">
+			</div>
 			<div id="mapContainer">
 				<canvas id="drawingLayer"></canvas>
 				<div id="mapLayer"></div>
@@ -28,7 +36,7 @@
 		</div>
 
 		<script>
-			// Map settings
+			// Map toolbar handling
 			let savedPlaces = [
 				{name: "Grand Canyon", coordinates: [36.1307675,-112.0945079], zoom: 12},
 				{name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
@@ -38,6 +46,15 @@
 				{name: "Shenandoah River", coordinates: [38.8943634, -78.4618465], zoom: 13},
 				{name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
 			];
+			// Add the saved places to the toolbar select
+			savedPlaces.forEach((place, index) => {
+				let option = document.createElement("option");
+				option.text = place.name;
+				option.value = index;
+				toolbar.locationSelect.add(option);
+			});
+
+			// Map settings
 			const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 			const urlRGBheight = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";
 			const accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
