@@ -10,6 +10,8 @@
 	<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
 	integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
 	crossorigin=""></script>
+	<script src="leaflet-tilelayer-colorpicker.js"></script>
+
 
 </head>
 	<body>
@@ -31,10 +33,23 @@
 			let mapboxURL = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 
 			let outdoors = L.tileLayer(mapboxURL, {
-				attribution: '', maxZoom: 14, accessToken: accessToken
+				attribution: '', maxZoom: 18, accessToken: accessToken
 			});
-			outdoors.addTo(mymap);
-			mymap.dragging.disable(); //disable drag for now
+
+
+            let mapboxRGBURL = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token=" + accessToken;
+            let colorpicker = L.tileLayer.colorPicker(mapboxRGBURL, {
+                attribution: ">",
+                minZoom: 0,
+                maxZoom: 18,
+                maxNativeZoom: 14,
+                opacity: 0.0
+            }).addTo(mymap);
+
+            outdoors.addTo(mymap);
+
+
+            //mymap.dragging.disable(); //disable drag for now
 		</script>
 		<script>
 			let canvasSelected = document.getElementById("drawing");
