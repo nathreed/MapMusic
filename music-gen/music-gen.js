@@ -35,6 +35,7 @@ function playTones(midiNotes, totalPlayTime) {
 
 //Callback will be called with a blob of the wav of the rendered audio
 function renderOffline(midiNotes, totalPlayTime, callback) {
+    console.log("TOTAL PLAY TIME RENDER OFFLINE", totalPlayTime);
     Tone.Offline(function() {
         playTones(midiNotes, totalPlayTime);
     }, totalPlayTime).then(function(buffer) {

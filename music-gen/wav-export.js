@@ -2,23 +2,25 @@ module.exports = {
     wavFromBuffer: wavFromBuffer
 };
 
-let recLength = 0;
-    recBuffersL = [];
-    recBuffersR = [];
-    sampleRate = 44100;
 
 function wavFromBuffer(buffer) {
+    let outputState = {
+        recLength: 0,
+        recBuffersL: [],
+        recBuffersR: [],
+        sampleRate:  44100
+    };
     let bufArr = [buffer.getChannelData(0), buffer.getChannelData(1)];
-    record(bufArr);
-    let blob = exportWAV("audio/wav");
+    record(bufArr, outputState);
+    let blob = exportWAV("audio/wav", outputState);
     return blob;
 }
 
 
-function record(inputBuffer) {
-    recBuffersL.push(inputBuffer[0]);
-    recBuffersR.push(inputBuffer[1]);
-    recLength += inputBuffer[0].length;
+function record(inputBuffer, state) {
+    state.recBuffersL.push(inputBuffer[0]);
+    state.recBuffersR.push(inputBuffer[1]);
+    state.recLength += inputBuffer[0].length;
 }
 
 function writeString(view, offset, string) {
@@ -35,7 +37,7 @@ function floatTo16BitPCM(output, offset, input) {
     }
 }
 
-function encodeWAV(samples, mono = false) {
+function encodeWAV(samples, mono = false, state) {
     const buffer = new ArrayBuffer(44 + (samples.length * 2));
     const view = new DataView(buffer);
 
@@ -54,9 +56,9 @@ function encodeWAV(samples, mono = false) {
     /* channel count */
     view.setUint16(22, mono ? 1 : 2, true);
     /* sample rate */
-    view.setUint32(24, sampleRate, true);
+    view.setUint32(24, state.sampleRate, true);
     /* byte rate (sample rate * block align) */
-    view.setUint32(28, sampleRate * 4, true);
+    view.setUint32(28, state.sampleRate * 4, true);
     /* block align (channel count * bytes per sample) */
     view.setUint16(32, 4, true);
     /* bits per sample */
@@ -98,12 +100,14 @@ function interleave(inputL, inputR) {
     return result;
 }
 
-function exportWAV(type) {
-    const bufferL = mergeBuffers(recBuffersL, recLength);
-    const bufferR = mergeBuffers(recBuffersR, recLength);
+function exportWAV(type, state) {
+
+    const bufferL = mergeBuffers(state.recBuffersL, state.recLength);
+    const bufferR = mergeBuffers(state.recBuffersR, state.recLength);
     const interleaved = interleave(bufferL, bufferR);
-    const dataview = encodeWAV(interleaved);
+    const dataview = encodeWAV(interleaved, false, state);
     const audioBlob = new Blob([dataview], { type });
+
 
     return audioBlob;
 }

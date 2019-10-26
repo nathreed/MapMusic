@@ -27,3 +27,14 @@ So we will take this 0-100 number and map it onto the musical scale between C1 a
 1. `npm install -g browserify` (one time)
 1. `npm install` (one time/when dependencies are added)
 1. `./browserify-build.sh` (every time you change the JS)
+
+
+## Things We Should Add
+
+- controls pane on right: drop down or tabbed interface to select controls for which instrument/effect
+and then the controls adapt
+
+- for the pitch drawing instrument we have now: user-configurable length of play
+maybe add linear interpolation of elevation data so that we can only sample a few 
+points from the user's line, helpful for shorter clips
+
