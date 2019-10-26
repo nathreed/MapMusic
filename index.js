@@ -1,7 +1,7 @@
-let L = require("leaflet");
+const L = require("leaflet");
 require("leaflet-tilelayer-colorpicker");
-let Music = require("./music-gen");
-console.log(Music);
+const Music = require("./music-gen");
+const WaveformPlaylist = require('waveform-playlist');
 
 // Map toolbar handling
 let savedPlaces = [
@@ -178,3 +178,24 @@ function normalizeToMidiNotes(noteMin, noteMax, elevations) {
 
     return midiNotes;
 }
+
+//Setup editor
+let playlist = WaveformPlaylist.init({
+    samplesPerPixel: 3000,
+    mono: true,
+    waveHeight: 70,
+    container: document.getElementById('loopEditorContainer'),
+    state: 'cursor',
+    colors: {
+        waveOutlineColor: '#E0EFF1',
+        timeColor: 'grey',
+        fadeColor: 'black'
+    },
+    controls: {
+        show: true,
+        width: 200
+    },
+    zoomLevels: [500, 1000, 3000, 5000]
+});
+console.log("added playlist");
+

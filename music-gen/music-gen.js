@@ -47,7 +47,7 @@ function renderOffline(midiNotes, totalPlayTime) {
         //Do something with output buffer
         console.log("OFFLINE RENDER OUTPUT:");
         console.log(buffer);
-        let wavBuffer = audioBufferToWav(buffer);
+
 
 
         setTimeout(function() {
@@ -55,22 +55,6 @@ function renderOffline(midiNotes, totalPlayTime) {
             console.log("STARTING PLAYER ON OFFLINE BUFFER!");
             player.start();
 
-            //Trigger download of the wav
-            //Adapted from https://github.com/Jam3/audiobuffer-to-wav/blob/master/demo/index.js
-            let blob = new window.Blob([ new DataView(wavBuffer) ], {
-                type: 'audio/wav'
-            });
-
-
-            let anchor = document.createElement('a');
-            document.body.appendChild(anchor);
-            anchor.style = 'display: none';
-
-            let url = window.URL.createObjectURL(blob);
-            anchor.href = url;
-            anchor.download = 'audio.wav';
-            anchor.click();
-            window.URL.revokeObjectURL(url);
         }, 10000)
     })
 }
