@@ -20,12 +20,13 @@
 		<div id="wholeUIContainer">
 			<div id="mapToolbar">
 				Hi! I'm the map toolbar
-				<input name="mode" type="radio" value="male">
+				<input type="radio" name="mode" id="panningMode" value="panning"><label for="panningMode">Panning</label>
+				<input type="radio" name="mode" id="drawingMode" value="drawing"><label for="drawingMode">Drawing</label>
 				<select name="locationSelect">
 					<option value="0">Grand Canyon</option>
 				</select> 
-				<button type="button" onclick="alert('Hello World!')">Save Location</button>
-				<input type="text" name="saveLocationName">
+				<button type="button">Save Location</button>
+				<input type="text" name="saveLocationName" value="New Location Save Name">
 			</div>
 			<div id="mapContainer">
 				<canvas id="drawingLayer"></canvas>

@@ -27,6 +27,7 @@ html, body {
 
 #mapContainer {
 	grid-area: mapContainer;
+	position: relative;
 }
 
 #drawingLayer {
