@@ -1,108 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Map Music</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-          integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-          crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-            integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-            crossorigin=""></script>
+	<meta charset="UTF-8">
+	<title>Map Music</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+	integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+	crossorigin=""/>
+	<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+	integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+	crossorigin=""></script>
 
 </head>
-<body style="height:100%;">
+	<body>
+		<div id="mapDrawingUIContainer">
+			<canvas id="drawing"></canvas>
+			<div id="map" style="height: 100vh; width: 100vw;"></div>
+		</div>
 
-    <div id="mapid" style="height: 100vh; width: 100vw;"></div>
-    <canvas id="drawing" style="height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; z-index: 999"></canvas>
+		<script>
+			// Map Settings
+			const center = [43.12861, -77.630081];
+			// Variable storing location so no stutter when starting again
+			let lastLocation = null;
+			// Map initialization
+			let mymap = L.map('map').setView(center, 16);
+			//let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
+			// Mapbox map layer layer
+			let accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+			let mapboxURL = "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}";
 
+			let outdoors = L.tileLayer(mapboxURL, {
+				id: 'outdoors-v9', attribution: '', maxZoom: 20, accessToken: accessToken
+			});
+			outdoors.addTo(mymap);
+			mymap.dragging.disable(); //disable drag for now
+		</script>
+		<script>
+			let canvasSelected = document.getElementById("drawing");
+			let context = canvasSelected.getContext("2d");
 
+			// TODO Reactively
+			canvasSelected.width = window.innerWidth;
+			canvasSelected.height = window.innerHeight;
 
-    <script>
-        // Map Settings
-        const center = [43.12861, -77.630081];
-        // Variable storing location so no stutter when starting again
-        let lastLocation = null;
-        // Map initialization
-        let mymap = L.map('mapid').setView(center, 16);
-        //let myLocationMarker = L.circleMarker(L.latLng(center), myLocationMarkerOptions);
-        // Mapbox map layer layer
-        let accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
-        let mapboxURL = "https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}";
+			// Drawing code
+			let paint = false;
+			let clickX = [];
+			let clickY = [];
+			const distanceThreshold = 5;
 
-        let outdoors = L.tileLayer(mapboxURL, {
-            id: 'outdoors-v9', attribution: '', maxZoom: 20, accessToken: accessToken
-        });
-        outdoors.addTo(mymap);
-        mymap.dragging.disable(); //disable drag for now
+			canvasSelected.onmousedown = function(e) {
+				paint = true;
+				const mouseX = e.pageX - this.offsetLeft;
+				const mouseY = e.pageY - this.offsetTop;
+				
+				addClick(mouseX, mouseY);
+				redraw();
+			};
 
-       // myLocationMarker.addTo(mymap);
-    </script>
-    <script>
-        let context = document.getElementById("drawing").getContext("2d");
-        let paint = false;
+			canvasSelected.onmousemove = function(e) {
+				if(paint) {
+					const mouseX = e.pageX - this.offsetLeft;
+					const mouseY = e.pageY - this.offsetTop;
 
-        let canvasSelected = document.getElementById("drawing");
-        canvasSelected.width = window.innerWidth;
-        canvasSelected.height = window.innerHeight;
-        document.getElementById("drawing").onmousedown = function(e) {
-            //let mouseX = e.pageX - this.offsetLeft;
-            //let mouseY = e.pageY - this.offsetTop;
-            let mouseX = e.pageX;
-            let mouseY = e.pageY;
-            paint = true;
-            addClick(mouseX, mouseY);
-            redraw();
-        };
+					// If meeting the distance criteria,
+					if(dist(mouseX, mouseY, clickX[clickX.length - 1], clickY[clickY.length - 1]) >= distanceThreshold){
+						addClick(mouseX, mouseY);
+						redraw();
+					}
+				}
+			};
 
-        document.getElementById("drawing").onmousemove = function(e) {
-            if(paint) {
-                /*let mouseX = e.pageX - this.offsetLeft;
-                let mouseY = e.pageY - this.offsetTop;*/
-                let mouseX = e.pageX;
-                let mouseY = e.pageY;
-                addClick(mouseX, mouseY, true);
-            }
-            redraw();
-        };
-
-        document.getElementById("drawing").onmouseup = function(e) {
-            paint = false;
-        };
-
-
-        let clickX = [];
-        let clickY = [];
-        let clickDrag = [];
-
-        function addClick(x, y, dragging) {
-            //todo add complicated data-cleaning logic here
-            clickX.push(x);
-            clickY.push(y);
-            clickDrag.push(dragging);
-        }
-
-        function redraw(){
-            context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
-
-            context.strokeStyle = "#df4b26";
-            context.lineJoin = "round";
-            context.lineWidth = 5;
-
-            for(let i=0; i < clickX.length; i++) {
-                context.beginPath();
-                if(clickDrag[i] && i){
-                    context.moveTo(clickX[i-1], clickY[i-1]);
-                }else{
-                    context.moveTo(clickX[i]-1, clickY[i]);
-                }
-                context.lineTo(clickX[i], clickY[i]);
-                context.closePath();
-                context.stroke();
-            }
-        }
+			canvasSelected.onmouseup = function(e) {
+				paint = false;
+				// TODO Convert to leaflet object
+				clickX = [];
+				clickY = [];
+			};
 
 
-    </script>
-</body>
+			function addClick(x, y) {
+				//todo add complicated data-cleaning logic here
+				clickX.push(x);
+				clickY.push(y);
+			}
+
+			function redraw(){
+				context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
+
+				context.strokeStyle = "#df4b26";
+				context.lineJoin = "round";
+				context.lineWidth = 5;
+
+				context.beginPath();
+				context.moveTo(clickX[0], clickY[0]);
+				for(let i = 1; i < clickX.length; i++) {
+					context.lineTo(clickX[i], clickY[i]);
+				}
+				context.stroke();
+				context.closePath();
+			}
+
+			function dist(x1, y1, x2, y2) {
+				return Math.hypot(x1 - x2, y1 + y2);
+			}
+		</script>
+	</body>
 </html>
