@@ -15,16 +15,20 @@
 		<div id="wholeUIContainer">
 			<div id="mapContainer">
 				<div id="mapToolbar" class="containerPadded">
-					Hi! I'm the map toolbar
-					<input type="radio" name="mode" id="panningMode" value="panning"><label for="panningMode">Panning</label>
+					Select mode:
+					<input type="radio" name="mode" id="panningMode" value="panning" checked><label for="panningMode">Panning</label>
 					<input type="radio" name="mode" id="drawingMode" value="drawing"><label for="drawingMode">Drawing</label>
+					&emsp;
+					Load a location:
 					<select name="locationSelect">
 					</select> 
+					&emsp;
+					Bookmark current location:
 					<input type="text" name="saveLocationName" placeholder="Location Save Name">
-					<button type="button" name="saveLocationButton">Bookmark Location</button>
+					<button type="button" name="saveLocationButton">Save</button>
 				</div>
 				<div id="mapWrapper">
-					<canvas id="drawingLayer"></canvas>
+					<canvas id="drawingLayer" class="noInteraction"></canvas>
 					<div id="mapLayer"></div>
 				</div>
 			</div>

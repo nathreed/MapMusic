@@ -5,17 +5,23 @@ const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
+// Important DOM things
+let canvasDOM = document.getElementById("drawingLayer");
+
 // Map toolbar handling
-let savedPlaces = [
-    {name: "Grand Canyon", coordinates: [36.1307675,-112.0945079], zoom: 12},
-    {name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
-    {name: "University of Rochester", coordinates: [43.1289624, -77.629125], zoom: 16},
-    {name: "Mount Everest", coordinates: [27.9881199, 86.9162203], zoom: 12},
-    {name: "Death Valley", coordinates: [36.5045059, -117.078918], zoom: 13},
-    {name: "Shenandoah River", coordinates: [38.8943634, -78.4618465], zoom: 13},
-    {name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
-];
 let mapToolbarChildren = document.getElementById("mapToolbar").children;
+
+// Process panning/drawing toggle
+document.getElementById("panningMode").oninput = function(e){
+    // Set to panning mode by removing click events on the canvas
+    console.log("setting pan mode");
+    canvasDOM.classList.add("noInteraction");
+};
+
+document.getElementById("drawingMode").oninput = function(e){
+    console.log("setting drawmode");
+    canvasDOM.classList.remove("noInteraction");
+};
 
 // Add a place to the saved locations list in display and data
 function addPlaceToPresetsDOM(place, index){
@@ -25,6 +31,15 @@ function addPlaceToPresetsDOM(place, index){
     mapToolbarChildren.locationSelect.add(option);
     savedPlaces[index] = place;
 }
+savedPlaces = [
+    {name: "Grand Canyon", coordinates: [36.128159479,-112.139167785], zoom: 11},
+    {name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
+    {name: "University of Rochester", coordinates: [43.1289624, -77.629125], zoom: 16},
+    {name: "Mount Everest", coordinates: [27.9881199, 86.9162203], zoom: 12},
+    {name: "Death Valley", coordinates: [36.3885879, -116.89384], zoom: 10},
+    {name: "Shenandoah River", coordinates: [38.8879720, -78.3622169], zoom: 12},
+    {name: "Appalachian Mountains", coordinates: [37.01330, -81.4879989624], zoom: 11}
+];
 savedPlaces.forEach(addPlaceToPresetsDOM); // Load in all of the preset options
 
 // Save the current location in the presets list
@@ -78,10 +93,8 @@ pathsAsCoordinates = [];
 pathsAsPolylines = [];
 pathsAsElevations = [];
 
-let canvasDOM = document.getElementById("drawingLayer");
-let canvasContext = canvasDOM.getContext("2d");
-
 // Update canvas coordinate system
+let canvasContext = canvasDOM.getContext("2d");
 let mapContainerDOM = document.getElementById("mapWrapper");
 window.onresize = function(e){
     canvasDOM.width = mapContainerDOM.offsetWidth;
@@ -95,7 +108,7 @@ const draftingLineColor = "#525442";
 const setLineColor = "#464738";
 let painting = false;
 let lineCoordinates = [];
-const distanceThreshold = 5;
+const rawDistanceThreshold = 2;
 
 canvasDOM.onmousedown = function(e) {
     painting = true;
@@ -120,11 +133,11 @@ canvasDOM.onmousemove = function(e) {
 
         // Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
         const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
-        const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(distanceThreshold);
+        const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(rawDistanceThreshold);
 
         // If greater than the distance criteria, draw set length lines towards current mouse location until too close
-        while(mouseLocation.distanceTo(lineCoordinates[lineCoordinates.length - 1]) >= distanceThreshold){
-            // Interpolate a point distanceThreshold units away from the last point (final bit of: https://math.stackexchange.com/a/175906)
+        while(mouseLocation.distanceTo(lineCoordinates[lineCoordinates.length - 1]) >= rawDistanceThreshold){
+            // Interpolate a point rawDistanceThreshold units away from the last point (final bit of: https://math.stackexchange.com/a/175906)
             const interpolatedPoint = du.add(lineCoordinates[lineCoordinates.length - 1]);
 
             // Add the interpolated point to the list
