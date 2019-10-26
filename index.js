@@ -14,6 +14,7 @@ let savedPlaces = [
     {name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
 ];
 
+
 // Map settings
 const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 const urlRGBheight = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";

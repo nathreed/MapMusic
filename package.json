@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "browserify": "rm -rf docs/dist && mkdir docs/dist && browserify index.js > docs/dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,8 @@
   "dependencies": {
     "leaflet": "^1.5.1",
     "leaflet-tilelayer-colorpicker": "^0.1.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.0"
   }
 }
