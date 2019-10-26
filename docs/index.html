@@ -31,20 +31,16 @@
 				</div>
 			</div>
 			<div id="audioControlsContainer" class="containerPadded">
-				Settings Selection:
-				<select name="settingsPaneSelector">
-					<option value="interpolation" selected>Interpolation</option>
-					<option value="something">Something else</option>
-				</select>
+				<strong>Staged Audio</strong>
 				<br>
 				Sound name:
-				<input type="text" name="soundName">
+				<input type="text" name="soundName" placeholder="Sound Title">
 				<div id="audioInterpolationContainer">
 					Low note:
-					<input type="number" name="lowNote" value="24">
+					<input type="number" name="lowNote" value="24" min="0" max="127">
 					<br>
 					High note:
-					<input type="number" name="highNote" value="84">
+					<input type="number" name="highNote" value="84" min="0" max="127">
 					<br>
 					Audio length editing mode:
 					<select name="audioLengthScalingMode">
@@ -56,6 +52,7 @@
 					
 					
 				</div>
+				<input type="button" name="addStagedAudio" value="Add to Timeline">
 			</div>
 			<div id="loopEditorWrapper" class="containerPadded">
 				<div id="editorToolbarContainer">

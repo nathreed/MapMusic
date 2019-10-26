@@ -54,12 +54,24 @@ html, body {
 	border: 2px solid #aaaaaa;
 }
 
-/* Style text input well */
-input[type="text"] {
+/* Style text input */
+input[type="text"], input[type="number"] {
 	background-color: transparent;
 	border: none;
 	color: #eeeeee;
 	border-bottom: 2px solid #eeeeee;
+}
+
+/* Style numerical input */
+input[type="number"] {
+	width: 2em;
+	-moz-appearance: textfield;
+}
+/* Old trick from: https://stackoverflow.com/a/4298216/3196151 */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 /* Button styling */
