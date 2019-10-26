@@ -9,15 +9,16 @@
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
-    <script   src="https://code.jquery.com/jquery-3.4.1.min.js"   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="   crossorigin="anonymous"></script>
 
 </head>
 <body style="height:100%;">
-    <!--<div id="mapid" style="height: 100vh; width: 100vw;"></div>-->
-    <canvas id="drawing" style="height: 100vh; width: 100vw; z-index: 999"></canvas>
+
+    <div id="mapid" style="height: 100vh; width: 100vw;"></div>
+    <canvas id="drawing" style="height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; z-index: 999"></canvas>
 
 
-    <!--<script>
+
+    <script>
         // Map Settings
         const center = [43.12861, -77.630081];
         // Variable storing location so no stutter when starting again
@@ -36,32 +37,38 @@
         mymap.dragging.disable(); //disable drag for now
 
        // myLocationMarker.addTo(mymap);
-    </script>-->
+    </script>
     <script>
         let context = document.getElementById("drawing").getContext("2d");
         let paint = false;
 
-        let canvasSelected = $("drawing");
-        canvasSelected.mousedown(function(e) {
-            let mouseX = e.pageX - this.offsetLeft;
-            let mouseY = e.pageY - this.offsetTop;
-
+        let canvasSelected = document.getElementById("drawing");
+        canvasSelected.width = window.innerWidth;
+        canvasSelected.height = window.innerHeight;
+        document.getElementById("drawing").onmousedown = function(e) {
+            //let mouseX = e.pageX - this.offsetLeft;
+            //let mouseY = e.pageY - this.offsetTop;
+            let mouseX = e.pageX;
+            let mouseY = e.pageY;
             paint = true;
             addClick(mouseX, mouseY);
             redraw();
-        });
+        };
 
-        canvasSelected.mousemove(function(e) {
+        document.getElementById("drawing").onmousemove = function(e) {
             if(paint) {
-                let mouseX = e.pageX - this.offsetLeft;
-                let mouseY = e.pageY - this.offsetTop;
+                /*let mouseX = e.pageX - this.offsetLeft;
+                let mouseY = e.pageY - this.offsetTop;*/
+                let mouseX = e.pageX;
+                let mouseY = e.pageY;
                 addClick(mouseX, mouseY, true);
             }
-        });
+            redraw();
+        };
 
-        canvasSelected.mouseup(function(e) {
+        document.getElementById("drawing").onmouseup = function(e) {
             paint = false;
-        });
+        };
 
 
         let clickX = [];
@@ -73,7 +80,6 @@
             clickX.push(x);
             clickY.push(y);
             clickDrag.push(dragging);
-            console.log("add click")
         }
 
         function redraw(){
@@ -83,7 +89,7 @@
             context.lineJoin = "round";
             context.lineWidth = 5;
 
-            for(var i=0; i < clickX.length; i++) {
+            for(let i=0; i < clickX.length; i++) {
                 context.beginPath();
                 if(clickDrag[i] && i){
                     context.moveTo(clickX[i-1], clickY[i-1]);
