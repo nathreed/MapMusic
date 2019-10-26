@@ -1,0 +1,22 @@
+{
+  "name": "mapmusic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathreed/MapMusic.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/nathreed/MapMusic/issues"
+  },
+  "homepage": "https://github.com/nathreed/MapMusic#readme",
+  "dependencies": {
+    "leaflet": "^1.5.1",
+    "leaflet-tilelayer-colorpicker": "^0.1.0"
+  }
+}

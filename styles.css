@@ -49,10 +49,12 @@ html, body {
 
 /* Audio controls stuff */
 #audioControlsContainer {
+	background-color: #3D3D3D;
 	grid-area: audioControls;
 }
 
 /* Loop editor stuff */
 #loopEditorContainer {
+	background-color: lightblue;
 	grid-area: loopEditor;
 }

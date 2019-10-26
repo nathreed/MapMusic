@@ -22,3 +22,8 @@ So we will take this 0-100 number and map it onto the musical scale between C1 a
 - volume: elevation maps to volume levels (easy mapping 0-100%) and modifies existing track
 - pitch warp: elevation maps to pitch warp factor (similar as above) and modifies existing track
 - CA$H MONEY: fun UI to determine how much money to bank transfer!
+
+## Install
+1. `npm install -g browserify` (one time)
+1. `npm install` (one time/when dependencies are added)
+1. `./browserify-build.sh` (every time you change the JS)
