@@ -84,6 +84,24 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 	border: 2px solid #ffffff;
 }
 
+/* Button groups */
+.buttonGroup {
+	display: inline;
+}
+.buttonGroup input[type="button"] {
+	border-radius: 0;
+	margin: auto 0;
+	border-width: 2px 1px;
+}
+.buttonGroup input[type="button"]:first-child {
+	border-radius: 500px 0 0 500px !important;
+	border-width: 2px 1px 2px 2px !important;
+}
+.buttonGroup input[type="button"]:last-child {
+	border-radius: 0 500px 500px 0 !important;
+	border-width: 2px 2px 2px 1px !important;
+}
+
 /* Used for disabling the canvas layer */
 .noInteraction {
 	opacity: 0;
