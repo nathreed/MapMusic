@@ -17,7 +17,8 @@
   "homepage": "https://github.com/nathreed/MapMusic#readme",
   "dependencies": {
     "leaflet": "^1.5.1",
-    "leaflet-tilelayer-colorpicker": "^0.1.0"
+    "leaflet-tilelayer-colorpicker": "^0.1.0",
+    "waveform-playlist": "^3.0.4"
   },
   "devDependencies": {
     "browserify": "^16.5.0",

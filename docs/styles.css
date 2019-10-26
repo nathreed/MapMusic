@@ -2,6 +2,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	border: 0;
+	font-family: sans-serif;
 }
 
 /* General layout stuff */
@@ -9,24 +10,40 @@ html, body {
 	display: grid;
 	align-items: stretch;
 	grid-template-columns: 1fr 300px;
-	grid-template-rows: auto 3fr 2fr;
+	grid-template-rows: 3fr 2fr;
+	grid-gap: 5px;
+	padding: 5px;
+	box-sizing: border-box;
 	grid-template-areas: 
-		"mapToolbar audioControls"
 		"mapContainer audioControls"
 		"loopEditor loopEditor";
 	width: 100vw;
 	height: 100vh;
+	background-color: #303030;
+}
+
+/* direct children of the UI settings only */
+#wholeUIContainer > div {
+	border-radius: 2px;
+}
+
+.containerPadded {
+	padding: 5px;
 }
 
 /* Map UI stuff */
 #mapToolbar {
-	grid-area: mapToolbar;
-	background-color: #3D3D3D;
 	color: #FFFFFF;
 }
 
 #mapContainer {
+	background-color: #3D3D3D;
 	grid-area: mapContainer;
+	display: grid;
+	grid-template-rows: auto 1fr;
+}
+
+#mapWrapper {
 	position: relative;
 }
 
@@ -36,7 +53,7 @@ html, body {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 1;
+	z-index: 2;
 }
 
 #mapLayer {
@@ -45,7 +62,7 @@ html, body {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: -1;
+	z-index: 1;
 }
 
 /* Audio controls stuff */

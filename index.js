@@ -13,7 +13,35 @@ let savedPlaces = [
     {name: "Shenandoah River", coordinates: [38.8943634, -78.4618465], zoom: 13},
     {name: "Appalachian Mountains", coordinates: [38.4381578, -79.2209245], zoom: 14}
 ];
+let mapToolbarChildren = document.getElementById("mapToolbar").children;
 
+// Add a place to the saved locations list in display and data
+function addPlaceToPresetsDOM(place, index){
+    let option = document.createElement("option");
+    option.text = place.name;
+    option.value = index;
+    mapToolbarChildren.locationSelect.add(option);
+    savedPlaces[index] = place;
+}
+savedPlaces.forEach(addPlaceToPresetsDOM); // Load in all of the preset options
+
+// Save the current location in the presets list
+mapToolbarChildren.saveLocationButton.onclick = function(e){
+    // Check if the name is already used in the places array
+    let newPlaceName = mapToolbarChildren.saveLocationName.value;
+    if(newPlaceName === "" || savedPlaces.reduce((accumulator, place) => {return accumulator || place.name === newPlaceName}, false)){
+        console.log("trying to add an already used name");
+    } else {
+        // Adding current location to presets list
+        addPlaceToPresetsDOM({name: newPlaceName, coordinates: mymap.getCenter(), zoom: mymap.getZoom()});
+    }
+};
+
+// Jump to the preset selected
+mapToolbarChildren.locationSelect.oninput = function(e){
+    let destination = savedPlaces[mapToolbarChildren.locationSelect.value];
+    mymap.setView(destination.coordinates, destination.zoom);
+};
 
 // Map settings
 const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
@@ -52,26 +80,25 @@ let canvasDOM = document.getElementById("drawingLayer");
 let canvasContext = canvasDOM.getContext("2d");
 
 // Update canvas coordinate system
-let mapContainerDOM = document.getElementById("mapContainer");
-canvasDOM.width = mapContainerDOM.offsetWidth;
-canvasDOM.height = mapContainerDOM.offsetHeight;
+let mapContainerDOM = document.getElementById("mapWrapper");
 window.onresize = function(e){
     canvasDOM.width = mapContainerDOM.offsetWidth;
     canvasDOM.height = mapContainerDOM.offsetHeight;
+    canvasCoordinates = canvasDOM.getBoundingClientRect();
 };
+window.onresize(); // Call once to set initial values for coordinate systems
 
 // Drawing code
-const draftingLineColor = "#737561";
+const draftingLineColor = "#525442";
 const setLineColor = "#464738";
 let painting = false;
 let lineCoordinates = [];
 const distanceThreshold = 5;
 
 canvasDOM.onmousedown = function(e) {
-    console.log("hi");
     painting = true;
-    const mouseLocation = L.point(e.pageX - this.offsetLeft,
-        e.pageY - this.offsetTop);
+    const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
+                                  e.clientY - canvasCoordinates.top);
 
     lineCoordinates.push(mouseLocation);
 
@@ -86,8 +113,8 @@ canvasDOM.onmousedown = function(e) {
 
 canvasDOM.onmousemove = function(e) {
     if(painting) {
-        const mouseLocation = L.point(e.pageX - this.offsetLeft,
-            e.pageY - this.offsetTop);
+        const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
+                                      e.clientY - canvasCoordinates.top);
 
         // Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
         const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
@@ -124,7 +151,7 @@ canvasDOM.onmouseup = function(e) {
             // Convert the RGB channels to one hex number then scale to mapbox elevation data
             return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
         } else {
-            console.log("crap, coordinates at " + point + " aren't color-readable.");
+            console.log("crap, coordinates at " + point + " aren't color-elevation-readable.");
         }
     });
 
@@ -133,9 +160,7 @@ canvasDOM.onmouseup = function(e) {
     pathsAsCoordinates.push(coordinates);
 
     //TEST: normalize elevations and print
-    console.log("**TESTING**");
-    console.log(elevations);
-    console.log(normalizeElevations100(elevations));
+    console.log("normalizeToMidiNotes:");
     console.log(normalizeToMidiNotes(24, 84, elevations));
     //Test play tones
     Music.playTones(normalizeToMidiNotes(24,84,elevations), 8);

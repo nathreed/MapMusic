@@ -10,22 +10,23 @@
 </head>
 	<body>
 		<div id="wholeUIContainer">
-			<div id="mapToolbar">
-				Hi! I'm the map toolbar
-				<input type="radio" name="mode" id="panningMode" value="panning"><label for="panningMode">Panning</label>
-				<input type="radio" name="mode" id="drawingMode" value="drawing"><label for="drawingMode">Drawing</label>
-				<select name="locationSelect">
-					<option value="0">Grand Canyon</option>
-				</select> 
-				<button type="button">Save Location</button>
-				<input type="text" name="saveLocationName" value="New Location Save Name">
-			</div>
 			<div id="mapContainer">
-				<canvas id="drawingLayer"></canvas>
-				<div id="mapLayer"></div>
+				<div id="mapToolbar" class="containerPadded">
+					Hi! I'm the map toolbar
+					<input type="radio" name="mode" id="panningMode" value="panning"><label for="panningMode">Panning</label>
+					<input type="radio" name="mode" id="drawingMode" value="drawing"><label for="drawingMode">Drawing</label>
+					<select name="locationSelect">
+					</select> 
+					<input type="text" name="saveLocationName" placeholder="Location Save Name">
+					<button type="button" name="saveLocationButton">Bookmark Location</button>
+				</div>
+				<div id="mapWrapper">
+					<canvas id="drawingLayer"></canvas>
+					<div id="mapLayer"></div>
+				</div>
 			</div>
-			<div id="audioControlsContainer">Hi! I'm the audio controls</div>
-			<div id="loopEditorContainer"></div>
+			<div id="audioControlsContainer" class="containerPadded">Hi! I'm the audio controls</div>
+			<div id="loopEditorContainer" class="containerPadded"></div>
 		</div>
 
 		<script src="dist/index.js"></script>
