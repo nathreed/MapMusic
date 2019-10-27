@@ -98,7 +98,8 @@ $("#musicTab").on("click", function() {
 	document.getElementById("audioControlsWrapper").style.display = "";
 
 	document.getElementById("editorHideWrapper").style.display = "";
-	document.getElementById("checkShowWrapper").style.display = "none";
+    document.getElementById("checkShowWrapper").style.display = "none";
+    document.getElementById("loopEditorWrapper").style.overflow = "auto";
 
 	//We have to do this to not mess up the drawing
 	resizeCanvasesAndRedrawHistogram()
@@ -110,6 +111,7 @@ $("#cashTab").on("click", function() {
 
 	document.getElementById("editorHideWrapper").style.display = "none";
 	document.getElementById("checkShowWrapper").style.display = "";
+    document.getElementById("loopEditorWrapper").style.overflow = "none";
 
 	resizeCanvasesAndRedrawHistogram()
 });
@@ -182,7 +184,7 @@ $("#cashGo").on("click", function() {
 	let sendBtn = document.getElementById("sendMoney");
 
     // Finalize the SVG
-    let svgString = checkSVG.svgString.replace("\{svgDollarNumberText\}", amount);
+    let svgString = checkSVG.svgString.replace("\{svgDollarNText\}", amount);
     svgString = svgString.replace("\{svgDollarWordsText\}", finalAmtString);
     svgString = svgString.replace("\{svgDateText\}", dateString);
     if(sendBtn.checked) {

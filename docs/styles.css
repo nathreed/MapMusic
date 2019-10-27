@@ -191,7 +191,8 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 
 /* Cash Money Stuff */
 #checkShowWrapper {
-	/*image fit */
+	max-width: 100%;
+	max-height: 100%;
 }
 
 /* Overriding playlist graphics */
