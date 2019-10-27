@@ -34,6 +34,15 @@
 		</div>
 	</div>
 	<div id="audioControlsContainer" class="containerPadded">
+		<div id="musicCashTabWrapper">
+			Controls:
+			<div class="buttonGroup">
+				<input type="radio" name="tab" id="musicTab" value="music" autocomplete="off" checked><label for="musicTab" class="radioButton">Music</label><!--
+					 --><input type="radio" name="tab" id="cashTab" value="cash" autocomplete="off"><label for="cashTab" class="radioButton">Ca$h Money</label>
+			</div>
+		</div>
+		<br>
+		<hr/>
 		<div id="terrainDiagram">
 			<h4>Terrain Elevation Diagram</h4>
 			<canvas id="stagedAudioCanvas"></canvas>
@@ -64,10 +73,35 @@
 			<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8.0" min="0.0" autocomplete="off"> seconds
 			<br>
 			<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
+
+			<div id="audioControlsSubmitButtons" class="buttonGroup" style="display: block">
+				<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+			</div>
 		</div>
-		<div id="audioControlsSubmitButtons" class="buttonGroup">
-			<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+
+		<div id="bankingControlsWrapper" style="display:none">
+			<h4>Send or Request Money</h4>
+			<br>
+			Send/Request (select with elevation):
+			<br><br>
+			<div class="buttonGroup" style="display: block">
+				<input type="radio" name="cash" id="sendMoney" value="send" autocomplete="off" checked disabled><label for="sendMoney" class="radioButton">Send Money</label><!--
+					 --><input type="radio" name="cash" id="reqMoney" value="request" autocomplete="off" disabled><label for="reqMoney" class="radioButton">Request Money</label>
+			</div>
+			<br>
+			<br>
+			<label for="cashAmount">Amount:</label>
+			<input type="number" value="" id="cashAmount" disabled>
+			<br>
+			<label for="cashName">Other Name:</label>
+			<input type="text" value="Name" id="cashName">
+			<br>
+			<label for="yourName">Your Name:</label>
+			<input type="text" value="Your Name" id="yourName">
+			<br><br>
+			<input type="button" id="cashGo" value="Go">
 		</div>
+
 	</div>
 	<div id="loopEditorWrapper">
 		<div id="editorToolbarContainer" class="containerPadded">

@@ -99,6 +99,41 @@ pathsAsElevations = [];
 let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
 let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
 
+//Switch between music tab and cash tab
+$("#musicTab").on("click", function() {
+	document.getElementById("bankingControlsWrapper").style.display = "none";
+	document.getElementById("audioControlsWrapper").style.display = "";
+});
+
+$("#cashTab").on("click", function() {
+	document.getElementById("bankingControlsWrapper").style.display = "";
+	document.getElementById("audioControlsWrapper").style.display = "none";
+});
+//Given the last set of elevations, determine whether to send them to the music playing code or the bank code
+//This will be determined based on which tab is selected on top
+function elevationDataDispatch(elevations) {
+	let musicTab = document.getElementById("musicTab");
+	if(musicTab.checked) {
+		//Music tab is selected, dispatch to music code
+		musicPlay(elevations);
+	} else {
+		//Cash tab is selected, dispatch to cash code
+		cash(elevations);
+	}
+}
+
+function musicPlay(elevations) {
+	//Get the config values from the page
+	let configValues = getAudioConfigValues();
+	if(configValues.playLivePreview) {
+		Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
+	}
+}
+
+function cash(elevations) {
+
+}
+
 // Update canvas coordinate system
 let mapContainerDOM = document.getElementById("mapWrapper");
 let canvasContext = canvasDOM.getContext("2d");
@@ -142,9 +177,7 @@ function getAudioConfigValues() {
 	let sampleTo = $("#sampleTo").val();
 	let sampleToPredicate = document.getElementById("sampleToPredicate").checked;
 
-	//todo stub
-	//one of these will be true, or something, and then we ultimately set the synth string which will go in the config
-	//it will be either "classic" or "duo"
+
 	let synth;
 	let classicSynth = document.getElementById("classicSynth");
 	let duoSynth = document.getElementById("duoSynth");
@@ -258,11 +291,7 @@ canvasDOM.onmouseup = function(e) {
 		pathsAsElevations.push(elevations);
 		pathsAsCoordinates.push(coordinates);
 
-		//Get the config values from the page
-		let configValues = getAudioConfigValues();
-		if(configValues.playLivePreview) {
-			Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
-		}
+		elevationDataDispatch(elevations);
 
 		renderElevationHistogram(elevations);
 	}
