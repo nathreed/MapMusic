@@ -95,13 +95,21 @@ pathsAsCoordinates = [];
 pathsAsPolylines = [];
 pathsAsElevations = [];
 
+// Audio config preview canvas
+let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
+let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
+
 // Update canvas coordinate system
-let canvasContext = canvasDOM.getContext("2d");
 let mapContainerDOM = document.getElementById("mapWrapper");
+let canvasContext = canvasDOM.getContext("2d");
 window.onresize = function(e){
     canvasDOM.width = mapContainerDOM.offsetWidth;
     canvasDOM.height = mapContainerDOM.offsetHeight;
     canvasCoordinates = canvasDOM.getBoundingClientRect();
+
+    // Code for later stuff
+    stagedAudioCanvasDOM.width = stagedAudioCanvasDOM.clientWidth;
+    stagedAudioCanvasDOM.height = stagedAudioCanvasDOM.clientHeight;
 };
 window.onresize(); // Call once to set initial values for coordinate systems
 
@@ -215,12 +223,22 @@ canvasDOM.onmouseup = function(e) {
         pathsAsElevations.push(elevations);
         pathsAsCoordinates.push(coordinates);
 
-
         //Get the config values from the page
         let configValues = getAudioConfigValues();
         if(configValues.playLivePreview) {
             Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
         }
+
+        // Plot the elevation map
+        let histogramValues = interpolateArray(elevations, Math.floor(stagedAudioCanvasDOM.width));
+        const maxHeight =  Math.max( ...histogramValues);
+        const minHeight =  Math.min( ...histogramValues);
+        stagedAudioCanvasContext.clearRect(0, 0, stagedAudioCanvasDOM.width, stagedAudioCanvasDOM.height);
+        histogramValues.forEach((height, index) => {
+            let normalizedHeight = (height - minHeight)/(maxHeight - minHeight);
+            stagedAudioCanvasContext.fillStyle = "#fff";
+            stagedAudioCanvasContext.fillRect(index, stagedAudioCanvasDOM.height * (1 - normalizedHeight), 1, stagedAudioCanvasDOM.height * normalizedHeight);
+        });
 
     }
 
@@ -322,17 +340,6 @@ let audioPos = 0;
 let isLooping = false;
 let playoutPromises;
 
-function toggleActive(node) {
-    let active = node.parentNode.querySelectorAll('.active');
-    let i = 0, len = active.length;
-
-    for (; i < len; i++) {
-        active[i].classList.remove('active');
-    }
-
-    node.classList.toggle('active');
-}
-
 function updateSelect(start, end) {
     if (start < end) {
         $('.btn-trim-audio').removeClass('disabled');
@@ -368,17 +375,14 @@ $container.on("click", ".btn-clear", function() {
 
 document.getElementById("btn-cursor").onclick = function(e) {
     ee.emit("statechange", "cursor");
-    toggleActive(this);
 };
 
 document.getElementById("btn-select").onclick = function(e) {
     ee.emit("statechange", "select");
-    toggleActive(this);
 };
 
 document.getElementById("btn-shift").onclick = function(e) {
     ee.emit("statechange", "shift");
-    toggleActive(this);
 };
 
 $container.on("click", ".btn-trim-audio", function() {
@@ -449,33 +453,62 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-    const keyName = e.key;
-    //Spacebar: toggle play pause
-    if(keyName === " ") {
-        if(playlist.isPlaying()) {
-            isLooping = false;
-            ee.emit("pause");
-        } else {
-            ee.emit("play");
+    if(!e.isComposing){
+        // TODO find a way to check if the user is not typing in a text box (from within the keyboard event)
+        const keyName = e.key;
+        switch(keyName){
+            case " ":
+                // Spacebar: toggle play pause
+                if(playlist.isPlaying()) {
+                    isLooping = false;
+                    ee.emit("pause");
+                } else {
+                    ee.emit("play");
+                }
+            break;
+            case "p":
+                // P: map panning mode
+                // Set to panning mode by removing click events on the canvas
+                console.log("setting pan mode");
+                canvasDOM.classList.add("noInteraction");
+                document.getElementById("panningMode").checked = true;
+            break;
+            case "d":
+                // D: map drawing mode
+                console.log("setting drawing mode");
+                canvasDOM.classList.remove("noInteraction");
+                document.getElementById("drawingMode").checked = true;
+            break;
+            case "s":
+                // S: stop playlist audio
+                isLooping = false;
+                ee.emit("stop");
+            break;
+            case "x":
+                // X: clear playlist tracks
+                isLooping = false;
+                ee.emit("clear");
+            break;
+            case "c":
+                // C: cursor playlist tool
+                ee.emit("statechange", "cursor");
+                document.getElementById("btn-cursor").checked = true;
+            break;
+            case "l":
+                // L: select playlist tool
+                ee.emit("statechange", "select");
+                document.getElementById("btn-select").checked = true;
+            break;
+            case "f":
+                // F: shift playlist tool
+                ee.emit("statechange", "shift");
+                document.getElementById("btn-shift").checked = true;
+            break;
+            case "t":
+                // T: trip selection in playlist
+                ee.emit("trim");
+            break;
         }
-    } else if(keyName === "s") {
-        isLooping = false;
-        ee.emit("stop");
-    } else if(keyName === "x") {
-        isLooping = false;
-        ee.emit("clear");
-    } else if(keyName === "c") {
-        //cursor
-        ee.emit("statechange", "cursor");
-        toggleActive(this);
-    } else if(keyName === "s") {
-        ee.emit("statechange", "select");
-        toggleActive(this);
-    } else if(keyName === "f") {
-        ee.emit("statechange", "shift");
-        toggleActive(this);
-    } else if(keyName === "t") {
-        ee.emit("trim");
     }
 });
 },{"./music-gen":2,"leaflet":32,"leaflet-tilelayer-colorpicker":31,"waveform-playlist":75}],2:[function(require,module,exports){

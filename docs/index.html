@@ -36,13 +36,14 @@
 			<div id="audioControlsContainer" class="containerPadded">
 				<strong>Staged Audio</strong>
 				<br>
+				<canvas id="stagedAudioCanvas"></canvas>
 				<input type="checkbox" id="playLivePreview" checked/>
 				<label for="playLivePreview">Play Live Preview With Drawing</label>
 				<br>
 				<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
 				<div id="audioInterpolationContainer">
-					<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127">
-					<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127">
+					<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127" autocomplete="off">
+					<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127" autocomplete="off">
 					<br>
 					<label for="audioLengthScalingMode">Audio length editing mode:</label>
 					<select name="audioLengthScalingMode" id="audioLengthScalingMode">
@@ -50,7 +51,7 @@
 						<option value="noteDuration">Note duration</option>
 					</select>
 					<br>
-					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0"> seconds
+					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0" autocomplete="off"> seconds
 					
 				</div>
 				<div class="buttonGroup">

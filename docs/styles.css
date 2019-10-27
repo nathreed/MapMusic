@@ -159,6 +159,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 #audioControlsContainer {
 	grid-area: audioControls;
 	background-color: #3D3D3D;
+	min-width: 270px;
 }
 
 #stagedAudioLayer {
@@ -195,11 +196,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	margin: 5px auto;
 }
 
-.playlist .controls input[type=range] {
-	background-color: transparent;
-}
-
-.playlist .controls input[type=range]::-webkit-slider-runnable-track, .playlist .controls input[type="range"]::-moz-range-track {
+.playlist .controls input[type=range], .playlist .controls input[type=range]::-webkit-slider-runnable-track, .playlist .controls input[type="range"]::-moz-range-track, .playlist .controls input[type="range"]::-ms-track {
 	background-color: transparent;
 }
 
@@ -219,7 +216,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	color: #eeeeee;
 }
 
-.playlist .controls input[type="range"]::-moz-range-thumb {
+.playlist .controls input[type="range"]::-moz-range-thumb, .playlist .controls input[type="range"]::-ms-thumb, .playlist .controls input[type="range"]::-webkit-slider-thumb {
 	background: #ffa500;
 	width: 5px;
 	height: 12px;
