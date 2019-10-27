@@ -256,8 +256,6 @@ function normalizeElevations100(pathElevation) {
     //Simple idea for now: We just make their value be the % of the max they are
     let max = Math.max.apply(null, pathElevation);
     let min = Math.min.apply(null, pathElevation);
-    //console.log("MIN:", min);
-    //console.log("MAX:", max);
 
     let normalizedElevations = [];
     pathElevation.forEach(function(x) {
@@ -367,20 +365,20 @@ $container.on("click", ".btn-clear", function() {
     ee.emit("clear");
 });
 
-$container.on("click", ".btn-cursor", function() {
+document.getElementById("btn-cursor").onclick = function(e) {
     ee.emit("statechange", "cursor");
     toggleActive(this);
-});
+};
 
-$container.on("click", ".btn-select", function() {
+document.getElementById("btn-select").onclick = function(e) {
     ee.emit("statechange", "select");
     toggleActive(this);
-});
+};
 
-$container.on("click", ".btn-shift", function() {
+document.getElementById("btn-shift").onclick = function(e) {
     ee.emit("statechange", "shift");
     toggleActive(this);
-});
+};
 
 $container.on("click", ".btn-trim-audio", function() {
     ee.emit("trim");

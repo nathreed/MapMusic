@@ -30,13 +30,10 @@ html, body {
 }
 
 .containerPadded {
-	padding: 5px;
-	background-color: #3D3D3D;
+	padding: 10px;
 }
 
 /* Map UI stuff */
-#mapToolbar {
-}
 
 /* Style the radio selectors as buttons */
 .radioButton {
@@ -45,13 +42,6 @@ html, body {
 	color: #eeeeee;
 	font-size: 13px;
 	cursor: pointer;
-}
-#mapToolbar input[type="radio"] {
-	display: none;
-}
-
-#mapToolbar input[type="radio"]:checked + .radioButton {
-	border: 2px solid #aaaaaa;
 }
 
 /* Style text input */
@@ -75,7 +65,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* Button styling */
-input[type="button"] {
+input[type="button"], .buttonGroup .radioButton {
 	background-color: transparent;
 	padding: 5px 7px;
 	border-radius: 500px;
@@ -91,28 +81,41 @@ input[type="button"]:active, .radioButton:active {
 	background-color: #303030;
 }
 
-input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radioButton:focus {
+input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .radioButton:focus {
 	color: #ffffff;
 	border: 2px solid #ffffff;
 }
 
 /* Button groups */
 .buttonGroup {
-	display: inline;
+	display: inline-block;
 }
-.buttonGroup input[type="button"] {
+
+.buttonGroup input[type="button"], .buttonGroup .radioButton {
 	border-radius: 0;
 	margin: auto 0;
 	border-width: 2px 1px;
 }
-.buttonGroup input[type="button"]:first-child {
+
+.buttonGroup input[type="radio"]:checked + .radioButton {
+	background-color: #aaaaaa;
+	color: #3D3D3D;
+	border: 2px solid #aaaaaa;
+}
+
+.buttonGroup input[type="radio"] {
+	display: none;
+}
+
+.buttonGroup input[type="button"]:first-child, .buttonGroup input[type="radio"]:first-child + .radioButton {
 	border-radius: 500px 0 0 500px !important;
 	border-width: 2px 1px 2px 2px !important;
 }
-.buttonGroup input[type="button"]:last-child {
+.buttonGroup input[type="button"]:last-child, .buttonGroup .radioButton:last-child {
 	border-radius: 0 500px 500px 0 !important;
 	border-width: 2px 2px 2px 1px !important;
 }
+
 
 /* Used for disabling the canvas layer */
 .noInteraction {
@@ -122,6 +125,7 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 
 #mapContainer {
 	grid-area: mapContainer;
+	background-color: #3D3D3D;
 	display: grid;
 	grid-template-rows: auto 1fr;
 }
@@ -153,8 +157,8 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 
 /* Audio controls stuff */
 #audioControlsContainer {
-	background-color: #3D3D3D;
 	grid-area: audioControls;
+	background-color: #3D3D3D;
 }
 
 #stagedAudioLayer {
@@ -165,19 +169,63 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 /* Loop editor stuff */
 #loopEditorWrapper {
 	grid-area: loopEditor;
+	background-color: #3D3D3D;
 	max-height: 50vh;
 	overflow: auto;
 }
 
 /* Overriding playlist graphics */
 .playlist .playlist-tracks {
-	background-color: transparent !important;
+	background-color: transparent;
 }
 .playlist .channel-wrapper {
 	border-width: 1px 0;
 	border-color: #000000;
 	border-style: solid;
 }
+.playlist .controls {
+	background-color: transparent;
+}
+
 .playlist .controls header {
-	background-color: red;
+	background-color: #808080;
+	margin-bottom: 5px;
+}
+.playlist .controls label {
+	margin: 5px auto;
+}
+
+.playlist .controls input[type=range] {
+	background-color: transparent;
+}
+
+.playlist .controls input[type=range]::-webkit-slider-runnable-track, .playlist .controls input[type="range"]::-moz-range-track {
+	background-color: transparent;
+}
+
+.playlist .controls label::after {
+	content: "+";
+	font-size: 24px;
+	color: #eeeeee;
+}
+
+.playlist .controls label::before {
+	content: "-";
+	font-size: 24px;
+	color: #eeeeee;
+}
+.playlist .controls .btn-mute::after {
+	content: " | ";
+	color: #eeeeee;
+}
+
+.playlist .controls input[type="range"]::-moz-range-thumb {
+	background: #ffa500;
+	width: 5px;
+	height: 12px;
+	border-radius: 0;
+}
+.playlist .controls input[type="range"]::-moz-range-track {
+	height: 3px;
+	background-color: #808080;
 }

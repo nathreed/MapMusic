@@ -257,8 +257,6 @@ function normalizeElevations100(pathElevation) {
     //Simple idea for now: We just make their value be the % of the max they are
     let max = Math.max.apply(null, pathElevation);
     let min = Math.min.apply(null, pathElevation);
-    //console.log("MIN:", min);
-    //console.log("MAX:", max);
 
     let normalizedElevations = [];
     pathElevation.forEach(function(x) {
@@ -301,8 +299,16 @@ let playlist = WaveformPlaylist.init({
     },
     zoomLevels: [500, 1000, 3000, 5000]
 });
+
+playlist.load([{
+    "src": "suv-godbless.mp3",
+    "name": "SUV"
+}]).then(function() {
+    console.log("loading done!");
+});
 playlist.initExporter();
 console.log("added playlist");
+
 
 /*
 PLAYLIST EVENT CONTROL BELOW HERE
@@ -360,20 +366,20 @@ $container.on("click", ".btn-clear", function() {
     ee.emit("clear");
 });
 
-$container.on("click", ".btn-cursor", function() {
+document.getElementById("btn-cursor").onclick = function(e) {
     ee.emit("statechange", "cursor");
     toggleActive(this);
-});
+};
 
-$container.on("click", ".btn-select", function() {
+document.getElementById("btn-select").onclick = function(e) {
     ee.emit("statechange", "select");
     toggleActive(this);
-});
+};
 
-$container.on("click", ".btn-shift", function() {
+document.getElementById("btn-shift").onclick = function(e) {
     ee.emit("statechange", "shift");
     toggleActive(this);
-});
+};
 
 $container.on("click", ".btn-trim-audio", function() {
     ee.emit("trim");
@@ -382,6 +388,39 @@ $container.on("click", ".btn-trim-audio", function() {
 $container.on("click", ".btn-download", function () {
     ee.emit('startaudiorendering', 'wav');
 });
+
+
+
+let audioStates = ["uninitialized", "loading", "decoding", "finished"];
+
+ee.on("audiorequeststatechange", function(state, src) {
+    var name = src;
+
+    if (src instanceof File) {
+        name = src.name;
+    }
+
+    console.log("Track " + name + " is in state " + audioStates[state]);
+});
+
+ee.on("loadprogress", function(percent, src) {
+    let name = src;
+
+    if (src instanceof File) {
+        name = src.name;
+    }
+
+    console.log("Track " + name + " has loaded " + percent + "%");
+});
+
+ee.on("audiosourcesloaded", function() {
+    console.log("Tracks have all finished decoding.");
+});
+
+ee.on("audiosourcesrendered", function() {
+    console.log("Tracks have been rendered");
+});
+
 
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
