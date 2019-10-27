@@ -139,6 +139,9 @@ function getAudioConfigValues() {
 
     let soundName = $("#soundName").val();
 
+    let sampleTo = $("#sampleTo").val();
+    let sampleToPredicate = document.getElementById("sampleToPredicate").checked;
+
     if(scalingType === "totalLength") {
         return {
             highNote: highNote,
@@ -146,7 +149,9 @@ function getAudioConfigValues() {
             totalPlayTime: durationValue,
             noteDuration: false,
             playLivePreview: playLivePreview,
-            soundName: soundName
+            soundName: soundName,
+            sampleTo: sampleTo,
+            sampleToPredicate: sampleToPredicate
         }
     } else if(scalingType === "noteDuration") {
         return {
@@ -155,10 +160,21 @@ function getAudioConfigValues() {
             totalPlayTime: false,
             noteDuration: durationValue,
             playLivePreview: playLivePreview,
-            soundName: soundName
+            soundName: soundName,
+            sampleTo: sampleTo,
+            sampleToPredicate: sampleToPredicate
         }
     } else {
         console.log("ERROR! Unknown duration interpretation!");
+    }
+}
+
+document.getElementById("sampleToPredicate").onclick = function(e){
+    console.log("toggling resampling.")
+    if(this.checked){
+        document.getElementById("sampleTo").disabled = false;
+    } else {
+        document.getElementById("sampleTo").disabled = true;
     }
 }
 
@@ -231,7 +247,7 @@ canvasDOM.onmouseup = function(e) {
         //Get the config values from the page
         let configValues = getAudioConfigValues();
         if(configValues.playLivePreview) {
-            Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
+            Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
         }
 
         renderElevationHistogram(elevations);
@@ -262,7 +278,7 @@ function renderElevationHistogram(elevations){
 document.getElementById("addStagedAudio").onclick = function(e) {
     let elevations = pathsAsElevations[pathsAsElevations.length - 1];
     let configValues = getAudioConfigValues();
-    Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues, function (blob) {
+    Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues, function (blob) {
         console.log("blob callback, blob:", blob);
         playlist.load([{
             src: blob,
@@ -276,31 +292,29 @@ document.getElementById("addStagedAudio").onclick = function(e) {
 document.getElementById("playStagedAudio").onclick = function(e) {
     let elevations = pathsAsElevations[pathsAsElevations.length - 1];
     let configValues = getAudioConfigValues();
-    Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
+    Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
 };
 
-function normalizeElevations100(pathElevation) {
-    //We take the array of elevations and we map them onto a 0-100 scale
-    //Simple idea for now: We just make their value be the % of the max they are
-    let max = Math.max.apply(null, pathElevation);
-    let min = Math.min.apply(null, pathElevation);
-
-    let normalizedElevations = [];
-    pathElevation.forEach(function(x) {
-        normalizedElevations.push(((x-min)/(max-min))*100);
-    });
-    return normalizedElevations;
-}
-
-function normalizeToMidiNotes(noteMin, noteMax, elevations) {
+function normalizeToMidiNotes(noteMin, noteMax, sampleTo, sampleToPredicate, elevations) {
     //First normalize the elevations to the 100 scale
-    let elevations100 = normalizeElevations100(elevations);
+    const max = Math.max( ...elevations);
+    const min = Math.min( ...elevations);
+
+    let normalizedElevations = elevations.map((height) => {
+        return ((height - min)/(max - min)) * 100;
+    });
+
+    // If the user wants to resample the notes, do so
+    if(sampleToPredicate){
+        console.log("interpolating");
+        normalizedElevations = interpolateArray(normalizedElevations, sampleTo);
+    }
 
     //Next, apply a similar procedure to get midi notes, except this time with rounding bc midi notes are ints
     let midiNotes = [];
 
     //We don't need to find min and max, they are 0 and 100 by definition
-    elevations100.forEach(function(x) {
+    normalizedElevations.forEach(function(x) {
         let preRoundNote = ((x/100) * (noteMax - noteMin)) + noteMin;
         midiNotes.push(Math.round(preRoundNote));
     });
@@ -437,7 +451,6 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-    console.log("KEY EVENT ACTIVE ELEMENT:",document.activeElement);
     if(document.activeElement !== document.getElementsByTagName("body")[0]) {
         return; //no keyboard shortcuts while typing or having anything selected, just when the body is active
     }
@@ -455,13 +468,11 @@ document.addEventListener("keydown", function(e) {
         case "p":
             // P: map panning mode
             // Set to panning mode by removing click events on the canvas
-            console.log("setting pan mode");
             canvasDOM.classList.add("noInteraction");
             document.getElementById("panningMode").checked = true;
             break;
         case "d":
             // D: map drawing mode
-            console.log("setting drawing mode");
             canvasDOM.classList.remove("noInteraction");
             document.getElementById("drawingMode").checked = true;
             break;

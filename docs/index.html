@@ -17,7 +17,7 @@
 					Select mode:
 					<div class="buttonGroup">
 						<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!-- 
-					 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton" >Drawing</label>
+					 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
 					</div>
 					&emsp;
 					Load a location:
@@ -34,14 +34,12 @@
 				</div>
 			</div>
 			<div id="audioControlsContainer" class="containerPadded">
-				<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
+				<h4>Terrain Elevation</h4>
 				<canvas id="stagedAudioCanvas"></canvas>
-
 				<br>
-				<strong>Staged Audio</strong>
+				<h4>Staged Audio</h4>
 				<br>
-				<input type="checkbox" id="playLivePreview" checked/>
-				<label for="playLivePreview">Play live preview after drawing</label>
+				<input type="checkbox" id="playLivePreview" checked/><label for="playLivePreview">Play live preview after drawing</label>
 				<br>
 				<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
 				<div id="audioInterpolationContainer">
@@ -54,7 +52,9 @@
 						<option value="noteDuration">Note duration</option>
 					</select>
 					<br>
-					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0" autocomplete="off"> seconds
+					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8.0" min="0.0" autocomplete="off"> seconds
+					<br>
+					<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
 					
 				</div>
 				<div class="buttonGroup">
