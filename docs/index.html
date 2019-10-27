@@ -104,33 +104,39 @@
 
 	</div>
 	<div id="loopEditorWrapper">
-		<div id="editorToolbarContainer" class="containerPadded">
-			<div class="buttonGroup">
-				<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
-			</div>
+		<div id="editorHideWrapper">
+			<div id="editorToolbarContainer" class="containerPadded">
+				<div class="buttonGroup">
+					<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
+				</div>
 
-			<div class="buttonGroup">
-			    <input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
+				<div class="buttonGroup">
+					<input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
 			 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
 			 --><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
-			</div>
+				</div>
 
-			<input type="button" value="Trim" class="btn-trim-audio">
+				<input type="button" value="Trim" class="btn-trim-audio">
 
-			<input type="button" value="Download" class="btn-download">
+				<input type="button" value="Download" class="btn-download">
 
-			<div class="buttonGroup">
-				<input type="button" value="Save Project File" id="projSave"><!--
+				<div class="buttonGroup">
+					<input type="button" value="Save Project File" id="projSave"><!--
 			 --><input type="button" value="Load Project File" id="projLoad">
-			</div>
-			<div id="chooseFileContainer" style="display: none">
-				<input type="file" id="filePicker" name="files[]">
-			</div>
+				</div>
+				<div id="chooseFileContainer" style="display: none">
+					<input type="file" id="filePicker" name="files[]">
+				</div>
 
-			<div class="track-drop">Drop audio files here</div>
+				<div class="track-drop">Drop audio files here</div>
 
+			</div>
+			<div id="loopEditorContainer"></div>
 		</div>
-		<div id="loopEditorContainer"></div>
+
+		<div id="checkShowWrapper" style="display: none">
+			<!--check svg goes here...-->
+		</div>
 	</div>
 </div>
 

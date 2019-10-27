@@ -96,11 +96,17 @@ pathsAsElevations = [];
 $("#musicTab").on("click", function() {
 	document.getElementById("bankingControlsWrapper").style.display = "none";
 	document.getElementById("audioControlsWrapper").style.display = "";
+
+	document.getElementById("editorHideWrapper").style.display = "";
+	document.getElementById("checkShowWrapper").style.display = "none";
 });
 
 $("#cashTab").on("click", function() {
 	document.getElementById("bankingControlsWrapper").style.display = "";
 	document.getElementById("audioControlsWrapper").style.display = "none";
+
+	document.getElementById("editorHideWrapper").style.display = "none";
+	document.getElementById("checkShowWrapper").style.display = "";
 });
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
 //This will be determined based on which tab is selected on top
@@ -149,7 +155,7 @@ $("#cashGo").on("click", function() {
 	let amount = $("#cashAmount").val();
 
 	//Check to see if it's filled in
-	if(amount === "") return;
+	//if(amount === "") return;
 
 	//Get spelled out words for the dollar amount
 	let dollars = parseInt(amount);
@@ -159,6 +165,13 @@ $("#cashGo").on("click", function() {
 
 	let finalAmtString = dollarsString + centsString;
 	finalAmtString = finalAmtString.toUpperCase();
+
+	//Format date
+	//August 1, 2019
+	let date = new Date();
+	let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	let dateString = months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
+	
 
 
 	let sendBtn = document.getElementById("sendMoney");
