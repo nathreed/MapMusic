@@ -99,6 +99,9 @@ $("#musicTab").on("click", function() {
 
 	document.getElementById("editorHideWrapper").style.display = "";
 	document.getElementById("checkShowWrapper").style.display = "none";
+
+	//We have to do this to not mess up the drawing
+	resizeCanvasesAndRedrawHistogram()
 });
 
 $("#cashTab").on("click", function() {
@@ -107,6 +110,8 @@ $("#cashTab").on("click", function() {
 
 	document.getElementById("editorHideWrapper").style.display = "none";
 	document.getElementById("checkShowWrapper").style.display = "";
+
+	resizeCanvasesAndRedrawHistogram()
 });
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
 //This will be determined based on which tab is selected on top
@@ -171,7 +176,7 @@ $("#cashGo").on("click", function() {
 	let date = new Date();
 	let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	let dateString = months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
-	
+
 
 
 	let sendBtn = document.getElementById("sendMoney");
