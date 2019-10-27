@@ -5,9 +5,6 @@ const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
-// Important DOM things
-let canvasDOM = document.getElementById("drawingLayer");
-
 // Map toolbar handling
 let mapToolbarChildren = document.getElementById("mapToolbar").children;
 
@@ -95,10 +92,6 @@ pathsAsCoordinates = [];
 pathsAsPolylines = [];
 pathsAsElevations = [];
 
-// Audio config preview canvas
-let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
-let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
-
 //Switch between music tab and cash tab
 $("#musicTab").on("click", function() {
 	document.getElementById("bankingControlsWrapper").style.display = "none";
@@ -134,10 +127,19 @@ function cash(elevations) {
 
 }
 
-// Update canvas coordinate system
+// Audio config preview canvas
+let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
+let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
+
+// Map layer canvas
 let mapContainerDOM = document.getElementById("mapWrapper");
+let canvasDOM = document.getElementById("drawingLayer");
 let canvasContext = canvasDOM.getContext("2d");
-window.onresize = function(e){
+let canvasCoordinates;
+
+// Update each size and redraw on window resize
+function resizeCanvasesAndRedrawHistogram(resizeEvent){
+    console.log("resizing Canvases to ",  mapContainerDOM.offsetWidth, ", ", mapContainerDOM.offsetHeight);
 	canvasDOM.width = mapContainerDOM.offsetWidth;
 	canvasDOM.height = mapContainerDOM.offsetHeight;
 	canvasCoordinates = canvasDOM.getBoundingClientRect();
@@ -151,7 +153,10 @@ window.onresize = function(e){
 		renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
 	}
 };
-window.onresize(); // Call once to set initial values for coordinate systems
+
+// Call it once to initialize the values
+resizeCanvasesAndRedrawHistogram();
+window.onresize = resizeCanvasesAndRedrawHistogram;
 
 // Drawing code
 const draftingLineColor = "#525442";
@@ -349,7 +354,6 @@ function normalizeToMidiNotes(noteMin, noteMax, sampleTo, sampleToPredicate, ele
 
 	// If the user wants to resample the notes, do so
 	if(sampleToPredicate){
-		console.log("interpolating");
 		normalizedElevations = interpolateArray(normalizedElevations, sampleTo);
 	}
 
@@ -683,7 +687,7 @@ $("#projSave").on("click", function() {
 
 $("#projLoad").on("click", function() {
 	//Show the choose file button
-	document.getElementById("chooseFileContainer").style.display = "inline"
+	document.getElementById("chooseFileContainer").style.display = "inline";
 });
 
 document.getElementById("filePicker").addEventListener("change", handleFileSelect, false);
