@@ -112,6 +112,43 @@ let painting = false;
 let lineCoordinates = [];
 const rawDistanceThreshold = 2;
 
+function getAudioConfigValues() {
+    //Grab the values out of each thing that we want
+    //Right now we want high note, low note, and duration information
+    //High note
+    let highNote = parseInt($("#highNote").val());
+    let lowNote = parseInt($("#lowNote").val());
+
+    let scalingType = $("#audioLengthScalingMode").val();
+    let durationValue = parseFloat($("#audioLength").val());
+
+    let playLivePreview = document.getElementById("playLivePreview").checked;
+
+    let soundName = $("#soundName").val();
+
+    if(scalingType === "totalLength") {
+        return {
+            highNote: highNote,
+            lowNote: lowNote,
+            totalPlayTime: durationValue,
+            noteDuration: false,
+            playLivePreview: playLivePreview,
+            soundName: soundName
+        }
+    } else if(scalingType === "noteDuration") {
+        return {
+            highNote: highNote,
+            lowNote: lowNote,
+            totalPlayTime: false,
+            noteDuration: durationValue,
+            playLivePreview: playLivePreview,
+            soundName: soundName
+        }
+    } else {
+        console.log("ERROR! Unknown duration interpretation!");
+    }
+}
+
 canvasDOM.onmousedown = function(e) {
     painting = true;
     const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
@@ -177,16 +214,14 @@ canvasDOM.onmouseup = function(e) {
         // Add elevation data and path to arrays
         pathsAsElevations.push(elevations);
         pathsAsCoordinates.push(coordinates);
-        
-        Music.playTones(normalizeToMidiNotes(24, 84, elevations), 8);
-        Music.renderOffline(normalizeToMidiNotes(24, 84, elevations), 8, function (blob) {
-            console.log("blob callback, blob:", blob);
-            playlist.load([{
-                src: blob,
-                name: "MapSound",
-                gain: 0.5
-            }]);
-        });
+
+
+        //Get the config values from the page
+        let configValues = getAudioConfigValues();
+        if(configValues.playLivePreview) {
+            Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
+        }
+
     }
 
     // Reset canvas painting stuff
@@ -195,6 +230,19 @@ canvasDOM.onmouseup = function(e) {
     painting = false;
     lineCoordinates = [];
 };
+
+$("#addStagedAudio").on("click", function() {
+    let elevations = pathsAsElevations[pathsAsElevations.length - 1];
+    let configValues = getAudioConfigValues();
+    Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues, function (blob) {
+        console.log("blob callback, blob:", blob);
+        playlist.load([{
+            src: blob,
+            name: configValues.soundName,
+            gain: 0.5
+        }]);
+    });
+});
 
 function normalizeElevations100(pathElevation) {
     //We take the array of elevations and we map them onto a 0-100 scale
@@ -253,6 +301,7 @@ playlist.load([
     }
 ]).then(function() {
     console.log("playlist loaded shit");
+    playlist.initExporter();
 });
 console.log("added playlist");
 
@@ -369,7 +418,15 @@ function midi(note) {
     return new Tone.Frequency(note, "midi");
 }
 
-function playTones(midiNotes, totalPlayTime) {
+function playTones(midiNotes, config) {
+    let totalPlayTime;
+    if(!config.totalPlayTime) {
+        //The duration value is to be interpreted as a note duration
+        //We can get the total play time by multiplying by the number of notes
+        totalPlayTime = config.noteDuration * midiNotes.length;
+    } else {
+        totalPlayTime = config.totalPlayTime;
+    }
     //Initialization - set up synth and clear transport timeline
     Tone.Transport.stop();
     let synth = new Tone.Synth().toMaster();
@@ -397,10 +454,18 @@ function playTones(midiNotes, totalPlayTime) {
 }
 
 //Callback will be called with a blob of the wav of the rendered audio
-function renderOffline(midiNotes, totalPlayTime, callback) {
+function renderOffline(midiNotes, config, callback) {
+    let totalPlayTime;
+    if(!config.totalPlayTime) {
+        //The duration value is to be interpreted as a note duration
+        //We can get the total play time by multiplying by the number of notes
+        totalPlayTime = config.noteDuration * midiNotes.length;
+    } else {
+        totalPlayTime = config.totalPlayTime;
+    }
     console.log("TOTAL PLAY TIME RENDER OFFLINE", totalPlayTime);
     Tone.Offline(function() {
-        playTones(midiNotes, totalPlayTime);
+        playTones(midiNotes, config);
     }, totalPlayTime).then(function(buffer) {
         //Do something with output buffer
         console.log("OFFLINE RENDER OUTPUT:");

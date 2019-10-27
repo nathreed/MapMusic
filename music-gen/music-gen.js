@@ -6,7 +6,15 @@ function midi(note) {
     return new Tone.Frequency(note, "midi");
 }
 
-function playTones(midiNotes, totalPlayTime) {
+function playTones(midiNotes, config) {
+    let totalPlayTime;
+    if(!config.totalPlayTime) {
+        //The duration value is to be interpreted as a note duration
+        //We can get the total play time by multiplying by the number of notes
+        totalPlayTime = config.noteDuration * midiNotes.length;
+    } else {
+        totalPlayTime = config.totalPlayTime;
+    }
     //Initialization - set up synth and clear transport timeline
     Tone.Transport.stop();
     let synth = new Tone.Synth().toMaster();
@@ -34,10 +42,18 @@ function playTones(midiNotes, totalPlayTime) {
 }
 
 //Callback will be called with a blob of the wav of the rendered audio
-function renderOffline(midiNotes, totalPlayTime, callback) {
+function renderOffline(midiNotes, config, callback) {
+    let totalPlayTime;
+    if(!config.totalPlayTime) {
+        //The duration value is to be interpreted as a note duration
+        //We can get the total play time by multiplying by the number of notes
+        totalPlayTime = config.noteDuration * midiNotes.length;
+    } else {
+        totalPlayTime = config.totalPlayTime;
+    }
     console.log("TOTAL PLAY TIME RENDER OFFLINE", totalPlayTime);
     Tone.Offline(function() {
-        playTones(midiNotes, totalPlayTime);
+        playTones(midiNotes, config);
     }, totalPlayTime).then(function(buffer) {
         //Do something with output buffer
         console.log("OFFLINE RENDER OUTPUT:");
