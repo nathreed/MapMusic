@@ -38,8 +38,17 @@
 			<h4>Terrain Elevation Diagram</h4>
 			<canvas id="stagedAudioCanvas"></canvas>
 		</div>
+		<hr/>
 		<div id="audioControlsWrapper">
-			<h4>Staged Audio</h4>
+			<h4>Audio Controls</h4>
+			<br>
+			Synth:
+			<div class="buttonGroup">
+				<input type="radio" name="synth" id="classicSynth" value="classic" autocomplete="off" checked><label for="classicSynth" class="radioButton">Classic</label><!--
+					 --><input type="radio" name="synth" id="duoSynth" value="duo" autocomplete="off"><label for="duoSynth" class="radioButton">Duo</label>
+			</div>
+			<br>
+			<br>
 			<input type="checkbox" id="playLivePreview" checked/><label for="playLivePreview">Play live preview after drawing</label>
 			<br>
 			<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">

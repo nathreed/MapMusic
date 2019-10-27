@@ -142,6 +142,18 @@ function getAudioConfigValues() {
 	let sampleTo = $("#sampleTo").val();
 	let sampleToPredicate = document.getElementById("sampleToPredicate").checked;
 
+	//todo stub
+	//one of these will be true, or something, and then we ultimately set the synth string which will go in the config
+	//it will be either "classic" or "duo"
+	let synth;
+	let classicSynth = document.getElementById("classicSynth");
+	let duoSynth = document.getElementById("duoSynth");
+	if(classicSynth.checked) {
+		synth = "classic"
+	} else {
+		synth = "duo"
+	}
+
 	if(scalingType === "totalLength") {
 		return {
 			highNote: highNote,
@@ -151,7 +163,8 @@ function getAudioConfigValues() {
 			playLivePreview: playLivePreview,
 			soundName: soundName,
 			sampleTo: sampleTo,
-			sampleToPredicate: sampleToPredicate
+			sampleToPredicate: sampleToPredicate,
+			synth: synth
 		}
 	} else if(scalingType === "noteDuration") {
 		return {
@@ -162,7 +175,8 @@ function getAudioConfigValues() {
 			playLivePreview: playLivePreview,
 			soundName: soundName,
 			sampleTo: sampleTo,
-			sampleToPredicate: sampleToPredicate
+			sampleToPredicate: sampleToPredicate,
+			synth: synth
 		}
 	} else {
 		console.log("ERROR! Unknown duration interpretation!");
@@ -758,7 +772,17 @@ function playTones(midiNotes, config) {
     Tone.Transport.stop();
 
     //This is where we can change the synth parameters
-    let synth = new Tone.DuoSynth().toMaster();
+    let synth;
+    switch(config.synth) {
+        case "duo":
+            synth = new Tone.DuoSynth().toMaster();
+            break;
+        default:
+            console.log("Error! unknown synth, fall to classic.");
+        case "classic":
+            synth = new Tone.Synth().toMaster();
+            break;
+    }
 
     Tone.Transport._timeline.forEach(function(x) {
         Tone.Transport._timeline.remove(x);

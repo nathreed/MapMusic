@@ -19,7 +19,17 @@ function playTones(midiNotes, config) {
     Tone.Transport.stop();
 
     //This is where we can change the synth parameters
-    let synth = new Tone.DuoSynth().toMaster();
+    let synth;
+    switch(config.synth) {
+        case "duo":
+            synth = new Tone.DuoSynth().toMaster();
+            break;
+        default:
+            console.log("Error! unknown synth, fall to classic.");
+        case "classic":
+            synth = new Tone.Synth().toMaster();
+            break;
+    }
 
     Tone.Transport._timeline.forEach(function(x) {
         Tone.Transport._timeline.remove(x);

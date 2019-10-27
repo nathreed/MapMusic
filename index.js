@@ -141,6 +141,18 @@ function getAudioConfigValues() {
 	let sampleTo = $("#sampleTo").val();
 	let sampleToPredicate = document.getElementById("sampleToPredicate").checked;
 
+	//todo stub
+	//one of these will be true, or something, and then we ultimately set the synth string which will go in the config
+	//it will be either "classic" or "duo"
+	let synth;
+	let classicSynth = document.getElementById("classicSynth");
+	let duoSynth = document.getElementById("duoSynth");
+	if(classicSynth.checked) {
+		synth = "classic"
+	} else {
+		synth = "duo"
+	}
+
 	if(scalingType === "totalLength") {
 		return {
 			highNote: highNote,
@@ -150,7 +162,8 @@ function getAudioConfigValues() {
 			playLivePreview: playLivePreview,
 			soundName: soundName,
 			sampleTo: sampleTo,
-			sampleToPredicate: sampleToPredicate
+			sampleToPredicate: sampleToPredicate,
+			synth: synth
 		}
 	} else if(scalingType === "noteDuration") {
 		return {
@@ -161,7 +174,8 @@ function getAudioConfigValues() {
 			playLivePreview: playLivePreview,
 			soundName: soundName,
 			sampleTo: sampleTo,
-			sampleToPredicate: sampleToPredicate
+			sampleToPredicate: sampleToPredicate,
+			synth: synth
 		}
 	} else {
 		console.log("ERROR! Unknown duration interpretation!");
