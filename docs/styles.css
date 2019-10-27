@@ -177,11 +177,6 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	height: 10vh;
 }
 
-#audioControlsSubmitButtons {
-	position: absolute;
-	bottom: 15px;
-}
-
 /* Loop editor stuff */
 #loopEditorWrapper {
 	grid-area: loopEditor;
