@@ -481,7 +481,8 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-	if(document.activeElement !== document.getElementsByTagName("body")[0]) {
+	console.log("TAGNAME:", document.activeElement.tagName);
+	if(document.activeElement.tagName.toLowerCase() === "input") {
 		return; //no keyboard shortcuts while typing or having anything selected, just when the body is active
 	}
 	const keyName = e.key;
