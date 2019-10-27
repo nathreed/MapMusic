@@ -154,7 +154,7 @@ function cash(elevations) {
 
 	//Next determine the amount, this is the abs of the first minus last
 	let amount = Math.abs(elevations[0] - elevations[elevations.length - 1]);
-	document.getElementById("cashAmount").value = amount.toFixed(3);
+	document.getElementById("cashAmount").value = amount.toFixed(2);
 }
 
 //Cash go button - modify SVG
