@@ -123,8 +123,38 @@ function musicPlay(elevations) {
 }
 
 function cash(elevations) {
+	//First determine if we are sending or requesting money
+	//If the general trend is downhill, we are sending
+	//If the general trend is uphill, we are requesting
+	if(elevations[0] >= elevations[elevations.length - 1]) {
+		//First is greater than the last, that means downhill -> sending
+		document.getElementById("sendMoney").checked = true;
+	} else {
+		//Uphill -> requesting
+		document.getElementById("reqMoney").checked = true;
+	}
 
+	//Next determine the amount, this is the abs of the first minus last
+	let amount = Math.abs(elevations[0] - elevations[elevations.length - 1]);
+	document.getElementById("cashAmount").value = amount;
 }
+
+//Cash go button - modify SVG
+$("#cashGo").on("click", function() {
+	//Grab the names from the page
+	//And the amount, whether sending or receiving, etc
+	let senderName = $("#yourName").val();
+	let toName = $("#cashName").val();
+	let amount = $("#cashAmount").val();
+
+	let sendBtn = document.getElementById("sendMoney");
+	if(sendBtn.checked) {
+		//Sending money, generate check
+	} else {
+		//Requesting money, swap names on check
+	}
+
+});
 
 // Audio config preview canvas
 let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
