@@ -129,6 +129,7 @@ function cash(elevations) {
 // Audio config preview canvas
 let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
 let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
+let audioControlsWrapper = document.getElementById("audioControlsWrapper");
 
 // Map layer canvas
 let mapContainerDOM = document.getElementById("mapWrapper");
@@ -138,19 +139,19 @@ let canvasCoordinates;
 
 // Update each size and redraw on window resize
 function resizeCanvasesAndRedrawHistogram(resizeEvent){
-    console.log("resizing Canvases to ",  mapContainerDOM.offsetWidth, ", ", mapContainerDOM.offsetHeight);
-	canvasDOM.width = mapContainerDOM.offsetWidth;
-	canvasDOM.height = mapContainerDOM.offsetHeight;
+    console.log("resizing Canvases to ",  canvasDOM.offsetWidth, ", ", canvasDOM.offsetHeight);
+	canvasDOM.width = canvasDOM.offsetWidth;
+	canvasDOM.height = canvasDOM.offsetHeight;
 	canvasCoordinates = canvasDOM.getBoundingClientRect();
 
-	// Code for later stuff
-	stagedAudioCanvasDOM.width = audioControlsContainer.offsetWidth - 20; // 10px padding
-	stagedAudioCanvasDOM.height = window.innerHeight / 10; // 10 vh
+	// // Code for histogram window resizing
+	// stagedAudioCanvasDOM.width = audioControlsWrapper.offsetWidth - 20; // 10px padding
+	// stagedAudioCanvasDOM.height = window.innerHeight / 10; // 10 vh
 
-	// Redraw on resize
-	if(pathsAsElevations.length > 0){
-		renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
-	}
+	// // Redraw on resize
+	// if(pathsAsElevations.length > 0){
+	// 	renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
+	// }
 };
 
 // Call it once to initialize the values

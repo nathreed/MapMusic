@@ -59,12 +59,12 @@ input[type="text"], input[type="number"] {
 	border: none;
 	color: #eeeeee;
 	border-bottom: 2px solid #eeeeee;
+	-moz-appearance: textfield;
 }
 
 /* Style numerical input */
-input[type="number"] {
+.shortNumber {
 	width: 2em;
-	-moz-appearance: textfield;
 }
 /* Old trick from: https://stackoverflow.com/a/4298216/3196151 */
 input[type="number"]::-webkit-outer-spin-button,
