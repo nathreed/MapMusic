@@ -34,31 +34,34 @@
 				</div>
 			</div>
 			<div id="audioControlsContainer" class="containerPadded">
-				<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
-				<canvas id="stagedAudioCanvas"></canvas>
-
-				<br>
-				<strong>Staged Audio</strong>
-				<br>
-				<input type="checkbox" id="playLivePreview" checked/>
-				<label for="playLivePreview">Play live preview after drawing</label>
-				<br>
-				<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
-				<div id="audioInterpolationContainer">
-					<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127" autocomplete="off">
-					<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127" autocomplete="off">
+				<div id="terrainDiagram">
+					<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
+					<canvas id="stagedAudioCanvas"></canvas>
 					<br>
-					<label for="audioLengthScalingMode">Audio length editing mode:</label>
-					<select name="audioLengthScalingMode" id="audioLengthScalingMode">
-						<option value="totalLength">Total length</option>
-						<option value="noteDuration">Note duration</option>
-					</select>
-					<br>
-					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0" autocomplete="off"> seconds
-					
 				</div>
-				<div class="buttonGroup">
-					<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+				<div id="audioControls">
+					<strong>Staged Audio</strong>
+					<br>
+					<input type="checkbox" id="playLivePreview" checked/>
+					<label for="playLivePreview">Play live preview after drawing</label>
+					<br>
+					<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
+					<div id="audioInterpolationContainer">
+						<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127" autocomplete="off">
+						<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127" autocomplete="off">
+						<br>
+						<label for="audioLengthScalingMode">Audio length editing mode:</label>
+						<select name="audioLengthScalingMode" id="audioLengthScalingMode">
+							<option value="totalLength">Total length</option>
+							<option value="noteDuration">Note duration</option>
+						</select>
+						<br>
+						<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0" autocomplete="off"> seconds
+
+					</div>
+					<div class="buttonGroup">
+						<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+					</div>
 				</div>
 			</div>
 			<div id="loopEditorWrapper">
