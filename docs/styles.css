@@ -196,8 +196,8 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	margin: 5px auto;
 }
 
-.playlist .controls input[type=range], .playlist .controls input[type=range]::-webkit-slider-runnable-track, .playlist .controls input[type="range"]::-moz-range-track, .playlist .controls input[type="range"]::-ms-track {
-	background-color: transparent;
+.playlist .controls input[type=range], .playlist .controls input[type=range]::-webkit-slider-runnable-track, .playlist .controls input[type="range"]::-moz-range-track {
+	background: transparent;
 }
 
 .playlist .controls label::after {
@@ -216,7 +216,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	color: #eeeeee;
 }
 
-.playlist .controls input[type="range"]::-moz-range-thumb, .playlist .controls input[type="range"]::-ms-thumb, .playlist .controls input[type="range"]::-webkit-slider-thumb {
+.playlist .controls input[type="range"]::-moz-range-thumb, .playlist .controls input[type="range"]::-webkit-slider-thumb {
 	background: #ffa500;
 	width: 5px;
 	height: 12px;
