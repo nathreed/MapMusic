@@ -33,6 +33,11 @@ html, body {
 	padding: 10px;
 }
 
+h4 {
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
 /* Map UI stuff */
 
 /* Style the radio selectors as buttons */
@@ -42,6 +47,10 @@ html, body {
 	color: #eeeeee;
 	font-size: 13px;
 	cursor: pointer;
+}
+
+input, select {
+	margin: 3px 0px;
 }
 
 /* Style text input */
@@ -160,11 +169,17 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	grid-area: audioControls;
 	background-color: #3D3D3D;
 	min-width: 270px;
+	position: relative;
 }
 
 #stagedAudioLayer {
 	width: 100%;
 	height: 10vh;
+}
+
+#audioControlsSubmitButtons {
+	position: absolute;
+	bottom: 15px;
 }
 
 /* Loop editor stuff */
