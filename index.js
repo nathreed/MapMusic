@@ -557,7 +557,7 @@ $container.on("click", ".btn-download", function () {
 });
 
 ee.on('audiorenderingfinished', function (type, data) {
-	if(type == 'wav'){
+	if(type === 'wav'){
 		// Make a download link and click it, then make it all go away
 		let anchor = document.createElement('a');
 		anchor.style = 'display: none';
