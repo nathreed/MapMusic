@@ -32,10 +32,10 @@ function addPlaceToPresetsDOM(place, index){
     savedPlaces[index] = place;
 }
 savedPlaces = [
-    {name: "Grand Canyon", coordinates: [36.128159479,-112.139167785], zoom: 11},
+    {name: "Grand Canyon", coordinates: [35.81025936, -113.6302593801], zoom: 11},
     {name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
     {name: "University of Rochester", coordinates: [43.1289624, -77.629125], zoom: 16},
-    {name: "Mount Everest", coordinates: [27.9881199, 86.9162203], zoom: 12},
+    {name: "Mount Everest", coordinates: [27.9881199, 86.9162203], zoom: 11},
     {name: "Death Valley", coordinates: [36.3885879, -116.89384], zoom: 10},
     {name: "Shenandoah River", coordinates: [38.8879720, -78.3622169], zoom: 12},
     {name: "Appalachian Mountains", coordinates: [37.01330, -81.4879989624], zoom: 11}
@@ -65,7 +65,7 @@ mapToolbarChildren.locationSelect.oninput = function(e){
 // Map settings
 const urlTerrain = "https://api.mapbox.com/styles/v1/mwsundberg/ck26wfu0759jk1claf7a3bblm/tiles/{z}/{x}/{y}?access_token={accessToken}";
 const urlRGBheight = "https://api.mapbox.com/v4/mapbox.terrain-rgb/{z}/{x}/{y}.pngraw?access_token={accessToken}";
-const accessToken = "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw";
+const accessToken = "pk.eyJ1IjoibXdzdW5kYmVyZyIsImEiOiJjazI4Z3lkcHkwb3pzM2RwYm44YW9nM2ZuIn0.EyqGj9GuiUpvoauajxVPgA";
 
 // Map initialization
 let mymap = L.map("mapLayer").setView(savedPlaces[0].coordinates, savedPlaces[0].zoom);
@@ -387,6 +387,21 @@ $container.on("click", ".btn-download", function () {
     ee.emit('startaudiorendering', 'wav');
 });
 
+ee.on('audiorenderingfinished', function (type, data) {
+    if(type == 'wav'){
+        // Make a download link and click it, then make it all go away
+        let anchor = document.createElement('a');
+        anchor.style = 'display: none';
+        anchor.href = window.URL.createObjectURL(data);
+        document.body.appendChild(anchor);
+        anchor.download = 'audio.wav';
+        anchor.click();
+        window.URL.revokeObjectURL(anchor.href);
+        anchor.remove();
+    }
+});
+
+
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
     const indexScalar = (data.length - 1) / (newLength - 1);
@@ -650,11 +665,10 @@ function handleFileSelect(e) {
                 p.addTo(mymap);
             });
             //Load the saved places in
-            console.log(fileSavedPlaces);
+            //Clear the dropdown before we add everything back
             mapToolbarChildren.locationSelect.innerHTML = "";
             this.savedPlaces = fileSavedPlaces;
             this.savedPlaces.forEach(addPlaceToPresetsDOM);
-            console.log(this.savedPlaces);
             //Set the map center and zoom
             mymap.center = mapCenter;
             mymap.zoom = mapZoom;
@@ -665,7 +679,6 @@ function handleFileSelect(e) {
             console.log(e);
 
         }
-
 
         //Hide the choose file button now that we are done
         document.getElementById("chooseFileContainer").style.display = "none";
