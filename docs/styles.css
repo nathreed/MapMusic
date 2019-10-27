@@ -189,7 +189,16 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	overflow: auto;
 }
 
+#audioControlsSubmitButtons, #cashGo {
+	text-align: center;
+	display: block;
+	margin: 0 auto;
+}
+
 /* Cash Money Stuff */
+#musicCashTabWrapper {
+	text-align: center;
+}
 #checkShowWrapper {
 	width: 100%;
 	height: 100%;
@@ -197,6 +206,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 #checkShowWrapper svg {
 	max-width: 95%;
 	max-height: 95%;
+	display: block;
 	margin: 0 auto;
 	object-fit: contain;
 }

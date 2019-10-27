@@ -73,8 +73,8 @@
 			<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" class="shortNumber" value="8.0" min="0.0" autocomplete="off"> seconds
 			<br>
 			<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" class="shortNumber" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
-
-			<div id="audioControlsSubmitButtons" class="buttonGroup" style="display: block">
+			<br><br>
+			<div id="audioControlsSubmitButtons" class="buttonGroup">
 				<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
 			</div>
 		</div>
@@ -84,20 +84,18 @@
 			<br>
 			Send/Request (select with elevation):
 			<br><br>
-			<div class="buttonGroup" style="display: block">
-				<input type="radio" name="cash" id="sendMoney" value="send" autocomplete="off" checked disabled><label for="sendMoney" class="radioButton">Send Money</label><!--
-					 --><input type="radio" name="cash" id="reqMoney" value="request" autocomplete="off" disabled><label for="reqMoney" class="radioButton">Request Money</label>
+			<div class="buttonGroup">
+			    <input type="radio" name="cash" id="sendMoney" value="send" autocomplete="off" checked disabled><label for="sendMoney" class="radioButton">Send Money</label><!--
+			 --><input type="radio" name="cash" id="reqMoney" value="request" autocomplete="off" disabled><label for="reqMoney" class="radioButton">Request Money</label>
 			</div>
 			<br>
 			<br>
-			<label for="cashAmount">Amount (abs(min-max elevation)):</label>
+			<label for="cashAmount">Amount (elevation difference):</label>
 			<input type="number" value="" id="cashAmount" autocomplete="off" disabled>
 			<br>
-			<label for="cashName">Other Name:</label>
-			<input type="text" value="Name" id="cashName" autocomplete="off">
+			<label for="yourName">Your Name:</label><input type="text" value="Your Name" id="yourName" placeholder="Jane Doe" autocomplete="off">
 			<br>
-			<label for="yourName">Your Name:</label>
-			<input type="text" value="Your Name" id="yourName" autocomplete="off">
+			<label for="cashName">Other Name:</label><input type="text" value="Name" id="cashName" placeholder="John Smith" autocomplete="off">
 			<br><br>
 			<input type="button" id="cashGo" value="Generate Check">
 		</div>
