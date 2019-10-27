@@ -166,7 +166,7 @@ $("#cashGo").on("click", function() {
 	let dollars = parseInt(amount);
 	let dollarsString = numConverter.toWords(dollars) + " dollars";
 
-	let centsString = " and " + parseInt((amount-dollars)*100) + "/100";
+	let centsString = " and " + Math.round((amount-dollars)*100) + "/100";
 
 	let finalAmtString = dollarsString + centsString;
 	finalAmtString = finalAmtString.toUpperCase();
