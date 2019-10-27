@@ -19,6 +19,7 @@
   "dependencies": {
     "leaflet": "^1.5.1",
     "leaflet-tilelayer-colorpicker": "^0.1.0",
+    "number-to-words": "^1.2.4",
     "waveform-playlist": "^3.0.4"
   },
   "devDependencies": {

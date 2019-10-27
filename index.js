@@ -2,6 +2,7 @@ const L = require("leaflet");
 require("leaflet-tilelayer-colorpicker");
 const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
+const numConverter = require("number-to-words");
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
 // Map toolbar handling
@@ -136,7 +137,7 @@ function cash(elevations) {
 
 	//Next determine the amount, this is the abs of the first minus last
 	let amount = Math.abs(elevations[0] - elevations[elevations.length - 1]);
-	document.getElementById("cashAmount").value = amount;
+	document.getElementById("cashAmount").value = amount.toFixed(2);
 }
 
 //Cash go button - modify SVG
@@ -146,6 +147,19 @@ $("#cashGo").on("click", function() {
 	let senderName = $("#yourName").val();
 	let toName = $("#cashName").val();
 	let amount = $("#cashAmount").val();
+
+	//Check to see if it's filled in
+	if(amount === "") return;
+
+	//Get spelled out words for the dollar amount
+	let dollars = parseInt(amount);
+	let dollarsString = numConverter.toWords(dollars) + " dollars";
+
+	let centsString = " and " + parseInt((amount-dollars)*100) + "/100";
+
+	let finalAmtString = dollarsString + centsString;
+	finalAmtString = finalAmtString.toUpperCase();
+
 
 	let sendBtn = document.getElementById("sendMoney");
 	if(sendBtn.checked) {
