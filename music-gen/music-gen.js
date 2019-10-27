@@ -17,7 +17,9 @@ function playTones(midiNotes, config) {
     }
     //Initialization - set up synth and clear transport timeline
     Tone.Transport.stop();
-    let synth = new Tone.Synth().toMaster();
+
+    //This is where we can change the synth parameters
+    let synth = new Tone.DuoSynth().toMaster();
 
     Tone.Transport._timeline.forEach(function(x) {
         Tone.Transport._timeline.remove(x);

@@ -390,6 +390,37 @@ $container.on("click", ".btn-clear", function() {
     ee.emit("clear");
 });
 
+//Drag and Drop support
+$container.on("dragenter", ".track-drop", function(e) {
+    console.log("DRAG ENTER!");
+    e.preventDefault();
+    e.target.classList.add("drag-enter");
+});
+
+$container.on("dragover", ".track-drop", function(e) {
+    console.log("DRAG OVER!");
+    e.preventDefault();
+});
+
+$container.on("dragleave", ".track-drop", function(e) {
+    console.log("DRAG LEAVE!");
+    e.preventDefault();
+    e.target.classList.remove("drag-enter");
+});
+
+$container.on("drop", ".track-drop", function(e) {
+    console.log("DROP!");
+    e.preventDefault();
+    e.target.classList.remove("drag-enter");
+
+    let dropEvent = e.originalEvent;
+
+    for (let i = 0; i < dropEvent.dataTransfer.files.length; i++) {
+        ee.emit("newtrack", dropEvent.dataTransfer.files[i]);
+    }
+});
+
+
 document.getElementById("btn-cursor").onclick = function(e) {
     ee.emit("statechange", "cursor");
 };
@@ -724,7 +755,9 @@ function playTones(midiNotes, config) {
     }
     //Initialization - set up synth and clear transport timeline
     Tone.Transport.stop();
-    let synth = new Tone.Synth().toMaster();
+
+    //This is where we can change the synth parameters
+    let synth = new Tone.DuoSynth().toMaster();
 
     Tone.Transport._timeline.forEach(function(x) {
         Tone.Transport._timeline.remove(x);

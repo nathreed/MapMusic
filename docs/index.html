@@ -6,93 +6,95 @@
 	<link rel="stylesheet" type="text/css" href="dist/playlist.css">
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-	integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-	crossorigin=""/>
+		  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+		  crossorigin=""/>
 	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 </head>
 <body>
-	<div id="wholeUIContainer">
-		<div id="mapContainer">
-			<div id="mapToolbar" class="containerPadded">
-				Select mode:
-				<div class="buttonGroup">
-						<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!-- 
-					 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
-				</div>
-				&emsp;
-				Load a location:
-				<select name="locationSelect" autocomplete="off">
-				</select> 
-				&emsp;
-				Bookmark current location:
-				<input type="text" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
-				<input type="button" name="saveLocationButton" value="Save">
-			</div>
-			<div id="mapWrapper">
-				<canvas id="drawingLayer" class="noInteraction"></canvas>
-				<div id="mapLayer"></div>
-			</div>
-		</div>
-		<div id="audioControlsContainer" class="containerPadded">
-			<div id="terrainDiagram">
-				<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
-				<canvas id="stagedAudioCanvas"></canvas>
-				<br>
-			</div>
-			<br>
-			<h4>Staged Audio</h4>
-			<br>
-			<input type="checkbox" id="playLivePreview" checked/><label for="playLivePreview">Play live preview after drawing</label>
-			<br>
-			<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
-			<div id="audioInterpolationContainer">
-				<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127" autocomplete="off">
-				<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127" autocomplete="off">
-				<br>
-				<label for="audioLengthScalingMode">Audio length editing mode:</label>
-				<select name="audioLengthScalingMode" id="audioLengthScalingMode">
-					<option value="totalLength">Total length</option>
-					<option value="noteDuration">Note duration</option>
-				</select>
-				<br>
-				<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8.0" min="0.0" autocomplete="off"> seconds
-				<br>
-				<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
-			</div>
+<div id="wholeUIContainer">
+	<div id="mapContainer">
+		<div id="mapToolbar" class="containerPadded">
+			Select mode:
 			<div class="buttonGroup">
-				<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+				<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!--
+					 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
 			</div>
+			&emsp;
+			Load a location:
+			<select name="locationSelect" autocomplete="off">
+			</select>
+			&emsp;
+			Bookmark current location:
+			<input type="text" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
+			<input type="button" name="saveLocationButton" value="Save">
 		</div>
-		<div id="loopEditorWrapper">
-			<div id="editorToolbarContainer" class="containerPadded">
-				<div class="buttonGroup">
-					<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
-				</div>
-
-				<div class="buttonGroup">
-						<input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
-					 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
-					--><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
-				</div>
-
-				<input type="button" value="Trim" class="btn-trim-audio">
-
-				<input type="button" value="Download" class="btn-download">
-
-				<div class="buttonGroup">
-						<input type="button" value="Save Project File" id="projSave"><!--
-					--><input type="button" value="Load Project File" id="projLoad">
-				</div>
-				<div id="chooseFileContainer" style="display: none">
-					<input type="file" id="filePicker" name="files[]" />
-				</div>
-
-			</div>
-			<div id="loopEditorContainer"></div>
+		<div id="mapWrapper">
+			<canvas id="drawingLayer" class="noInteraction"></canvas>
+			<div id="mapLayer"></div>
 		</div>
 	</div>
+	<div id="audioControlsContainer" class="containerPadded">
+		<div id="terrainDiagram">
+			<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
+			<canvas id="stagedAudioCanvas"></canvas>
+			<br>
+		</div>
+		<br>
+		<h4>Staged Audio</h4>
+		<br>
+		<input type="checkbox" id="playLivePreview" checked/><label for="playLivePreview">Play live preview after drawing</label>
+		<br>
+		<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Untitled" autocomplete="off">
+		<div id="audioInterpolationContainer">
+			<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127" autocomplete="off">
+			<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127" autocomplete="off">
+			<br>
+			<label for="audioLengthScalingMode">Audio length editing mode:</label>
+			<select name="audioLengthScalingMode" id="audioLengthScalingMode">
+				<option value="totalLength">Total length</option>
+				<option value="noteDuration">Note duration</option>
+			</select>
+			<br>
+			<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8.0" min="0.0" autocomplete="off"> seconds
+			<br>
+			<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
+		</div>
+		<div class="buttonGroup">
+			<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+		</div>
+	</div>
+	<div id="loopEditorWrapper">
+		<div id="editorToolbarContainer" class="containerPadded">
+			<div class="buttonGroup">
+				<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
+			</div>
 
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script src="dist/index.js"></script>
+			<div class="buttonGroup">
+				<input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
+					 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
+					--><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
+			</div>
+
+			<input type="button" value="Trim" class="btn-trim-audio">
+
+			<input type="button" value="Download" class="btn-download">
+
+			<div class="buttonGroup">
+				<input type="button" value="Save Project File" id="projSave"><!--
+					--><input type="button" value="Load Project File" id="projLoad">
+			</div>
+			<div id="chooseFileContainer" style="display: none">
+				<input type="file" id="filePicker" name="files[]" />
+			</div>
+
+			<div class="track-drop">Drop audio files here</div>
+
+		</div>
+		<div id="loopEditorContainer"></div>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="dist/index.js"></script>
 </body>
 </html>

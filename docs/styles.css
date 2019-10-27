@@ -226,3 +226,11 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	height: 3px;
 	background-color: #808080;
 }
+
+.track-drop {
+	margin-top: 15px;
+	padding: 5px;
+	border: 2px dashed #aaaaaa;
+	text-align: center;
+	display: block;
+}
