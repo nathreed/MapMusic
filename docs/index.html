@@ -34,8 +34,11 @@
 				</div>
 			</div>
 			<div id="audioControlsContainer" class="containerPadded">
-				<h4>Terrain Elevation</h4>
-				<canvas id="stagedAudioCanvas"></canvas>
+				<div id="terrainDiagram">
+					<label for="stagedAudioCanvas"><strong>Terrain Elevation Diagram</strong></label>
+					<canvas id="stagedAudioCanvas"></canvas>
+					<br>
+				</div>
 				<br>
 				<h4>Staged Audio</h4>
 				<br>
@@ -55,10 +58,10 @@
 					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8.0" min="0.0" autocomplete="off"> seconds
 					<br>
 					<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
-					
-				</div>
-				<div class="buttonGroup">
-					<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+					</div>
+					<div class="buttonGroup">
+						<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+					</div>
 				</div>
 			</div>
 			<div id="loopEditorWrapper">

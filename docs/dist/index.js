@@ -758,14 +758,10 @@ function renderOffline(midiNotes, config, callback) {
     } else {
         totalPlayTime = config.totalPlayTime;
     }
-    console.log("TOTAL PLAY TIME RENDER OFFLINE", totalPlayTime);
     Tone.Offline(function() {
         playTones(midiNotes, config);
     }, totalPlayTime).then(function(buffer) {
         //Do something with output buffer
-        console.log("OFFLINE RENDER OUTPUT:");
-        console.log(buffer);
-
         let wavBlob = toWav(buffer);
         /*let blob = new window.Blob([ new DataView(wav) ], {
             type: 'audio/wav'
