@@ -53,6 +53,10 @@ input, select {
 	margin: 3px 0px;
 }
 
+input[disabled] {
+	cursor: not-allowed;
+}
+
 /* Style text input */
 input[type="text"], input[type="number"] {
 	background-color: transparent;
