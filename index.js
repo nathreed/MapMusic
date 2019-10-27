@@ -436,62 +436,60 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-    if(!e.isComposing){
-        // TODO find a way to check if the user is not typing in a text box (from within the keyboard event)
-        const keyName = e.key;
-        switch(keyName){
-            case " ":
-                // Spacebar: toggle play pause
-                if(playlist.isPlaying()) {
-                    isLooping = false;
-                    ee.emit("pause");
-                } else {
-                    ee.emit("play");
-                }
-            break;
-            case "p":
-                // P: map panning mode
-                // Set to panning mode by removing click events on the canvas
-                console.log("setting pan mode");
-                canvasDOM.classList.add("noInteraction");
-                document.getElementById("panningMode").checked = true;
-            break;
-            case "d":
-                // D: map drawing mode
-                console.log("setting drawing mode");
-                canvasDOM.classList.remove("noInteraction");
-                document.getElementById("drawingMode").checked = true;
-            break;
-            case "s":
-                // S: stop playlist audio
+    if(document.activeElement !== document.getElementsByTagName("body")[0]) {
+        return; //no keyboard shortcuts while typing or having anything selected, just when the body is active
+    }
+    const keyName = e.key;
+    switch(keyName){
+        case " ":
+            // Spacebar: toggle play pause
+            if(playlist.isPlaying()) {
                 isLooping = false;
-                ee.emit("stop");
+                ee.emit("pause");
+            } else {
+                ee.emit("play");
+            }
             break;
-            case "x":
-                // X: clear playlist tracks
-                isLooping = false;
-                ee.emit("clear");
+        case "p":
+            // P: map panning mode
+            // Set to panning mode by removing click events on the canvas
+            canvasDOM.classList.add("noInteraction");
+            document.getElementById("panningMode").checked = true;
             break;
-            case "c":
-                // C: cursor playlist tool
-                ee.emit("statechange", "cursor");
-                document.getElementById("btn-cursor").checked = true;
+        case "d":
+            // D: map drawing mode
+            canvasDOM.classList.remove("noInteraction");
+            document.getElementById("drawingMode").checked = true;
             break;
-            case "l":
-                // L: select playlist tool
-                ee.emit("statechange", "select");
-                document.getElementById("btn-select").checked = true;
+        case "s":
+            // S: stop playlist audio
+            isLooping = false;
+            ee.emit("stop");
             break;
-            case "f":
-                // F: shift playlist tool
-                ee.emit("statechange", "shift");
-                document.getElementById("btn-shift").checked = true;
+        case "x":
+            // X: clear playlist tracks
+            isLooping = false;
+            ee.emit("clear");
             break;
-            case "t":
-                // T: trip selection in playlist
-                ee.emit("trim");
+        case "c":
+            // C: cursor playlist tool
+            ee.emit("statechange", "cursor");
+            document.getElementById("btn-cursor").checked = true;
             break;
-        }
+        case "l":
+            // L: select playlist tool
+            ee.emit("statechange", "select");
+            document.getElementById("btn-select").checked = true;
+            break;
+        case "f":
+            // F: shift playlist tool
+            ee.emit("statechange", "shift");
+            document.getElementById("btn-shift").checked = true;
+            break;
+        case "t":
+            // T: trip selection in playlist
+            ee.emit("trim");
+            break;
     }
 });
 
