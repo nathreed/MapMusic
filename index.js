@@ -427,7 +427,6 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-    console.log("KEY EVENT ACTIVE ELEMENT:",document.activeElement);
     if(document.activeElement !== document.getElementsByTagName("body")[0]) {
         return; //no keyboard shortcuts while typing or having anything selected, just when the body is active
     }
@@ -445,13 +444,11 @@ document.addEventListener("keydown", function(e) {
         case "p":
             // P: map panning mode
             // Set to panning mode by removing click events on the canvas
-            console.log("setting pan mode");
             canvasDOM.classList.add("noInteraction");
             document.getElementById("panningMode").checked = true;
             break;
         case "d":
             // D: map drawing mode
-            console.log("setting drawing mode");
             canvasDOM.classList.remove("noInteraction");
             document.getElementById("drawingMode").checked = true;
             break;

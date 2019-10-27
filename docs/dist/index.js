@@ -401,7 +401,6 @@ ee.on('audiorenderingfinished', function (type, data) {
     }
 });
 
-
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
     const indexScalar = (data.length - 1) / (newLength - 1);
