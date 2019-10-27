@@ -206,29 +206,26 @@ $("#cashGo").on("click", function() {
 // Audio config preview canvas
 let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
 let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
-let audioControlsWrapper = document.getElementById("audioControlsWrapper");
 
 // Map layer canvas
 let mapContainerDOM = document.getElementById("mapWrapper");
-let canvasDOM = document.getElementById("drawingLayer");
+canvasDOM = document.getElementById("drawingLayer");
 let canvasContext = canvasDOM.getContext("2d");
-let canvasCoordinates;
 
 // Update each size and redraw on window resize
 function resizeCanvasesAndRedrawHistogram(resizeEvent){
     console.log("resizing Canvases to ",  canvasDOM.offsetWidth, ", ", canvasDOM.offsetHeight);
 	canvasDOM.width = canvasDOM.offsetWidth;
 	canvasDOM.height = canvasDOM.offsetHeight;
-	canvasCoordinates = canvasDOM.getBoundingClientRect();
 
 	// Code for histogram window resizing
-	// stagedAudioCanvasDOM.width = audioControlsWrapper.offsetWidth - 20; // 10px padding
-	// stagedAudioCanvasDOM.height = window.innerHeight / 10; // 10 vh
+	stagedAudioCanvasDOM.width = stagedAudioCanvasDOM.offsetWidth;
+	stagedAudioCanvasDOM.height = stagedAudioCanvasDOM.offsetHeight;
 
-	// // Redraw on resize
-	// if(pathsAsElevations.length > 0){
-	// 	renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
-	// }
+	// Redraw on resize
+	if(pathsAsElevations.length > 0){
+		renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
+	}
 };
 
 // Call it once to initialize the values
@@ -309,8 +306,7 @@ document.getElementById("sampleToPredicate").onclick = function(e){
 
 canvasDOM.onmousedown = function(e) {
 	painting = true;
-	const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-		e.clientY - canvasCoordinates.top);
+    const mouseLocation = L.point(e.offsetX, e.offsetY);
 
 	lineCoordinates.push(mouseLocation);
 
@@ -325,8 +321,7 @@ canvasDOM.onmousedown = function(e) {
 
 canvasDOM.onmousemove = function(e) {
 	if(painting) {
-		const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-			e.clientY - canvasCoordinates.top);
+        const mouseLocation = L.point(e.offsetX, e.offsetY);
 
 		// Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
 		const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
