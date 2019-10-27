@@ -34,17 +34,13 @@
 			<div id="audioControlsContainer" class="containerPadded">
 				<strong>Staged Audio</strong>
 				<br>
-				<label for="playLivePreview">Play Live Preview With Drawing</label>
 				<input type="checkbox" id="playLivePreview" checked/>
+				<label for="playLivePreview">Play Live Preview With Drawing</label>
 				<br>
-				<label for="soundName">Sound name:</label>
-				<input type="text" name="soundName" id="soundName" placeholder="Sound Title">
+				<label for="soundName">Sound name:</label> <input type="text" name="soundName" id="soundName" placeholder="Map Sound">
 				<div id="audioInterpolationContainer">
-					<label for="lowNote">Low note:</label>
-					<input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127">
-					<br>
-					<label for="highNote">High note:</label>
-					<input type="number" name="highNote" id="highNote" value="84" min="0" max="127">
+					<label for="lowNote">Low note:</label> <input type="number" name="lowNote" id="lowNote" value="24" min="0" max="127">
+					<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" value="84" min="0" max="127">
 					<br>
 					<label for="audioLengthScalingMode">Audio length editing mode:</label>
 					<select name="audioLengthScalingMode" id="audioLengthScalingMode">
@@ -52,14 +48,12 @@
 						<option value="noteDuration">Note duration</option>
 					</select>
 					<br>
-					<label for="audioLength">Length: </label>
-					<input type="number" name="audioLength" id="audioLength" value="8">
-					<br>
-					Sampling rate:
-					
+					<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" value="8" min="0"> seconds
 					
 				</div>
-				<input type="button" name="addStagedAudio" id="addStagedAudio" value="Add Last to Timeline">
+				<div class="buttonGroup">
+					<input type="button" name="playStagedAudio" id="playStagedAudio" value="Play Staged Audio"><input type="button" name="addStagedAudio" id="addStagedAudio" value="Add to Timeline">
+				</div>
 			</div>
 			<div id="loopEditorWrapper" class="containerPadded">
 				<div id="editorToolbarContainer">

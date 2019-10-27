@@ -231,7 +231,8 @@ canvasDOM.onmouseup = function(e) {
     lineCoordinates = [];
 };
 
-$("#addStagedAudio").on("click", function() {
+// Audio config options pane submit action
+document.getElementById("addStagedAudio").onclick = function(e) {
     let elevations = pathsAsElevations[pathsAsElevations.length - 1];
     let configValues = getAudioConfigValues();
     Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues, function (blob) {
@@ -242,7 +243,14 @@ $("#addStagedAudio").on("click", function() {
             gain: 0.5
         }]);
     });
-});
+};
+
+// Audio config options pane play audio again action
+document.getElementById("playStagedAudio").onclick = function(e) {
+    let elevations = pathsAsElevations[pathsAsElevations.length - 1];
+    let configValues = getAudioConfigValues();
+    Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
+}
 
 function normalizeElevations100(pathElevation) {
     //We take the array of elevations and we map them onto a 0-100 scale
@@ -285,7 +293,7 @@ let playlist = WaveformPlaylist.init({
     colors: {
         waveOutlineColor: '#3D3D3D',
         timeColor: 'grey',
-        fadeColor: 'black'
+        fadeColor: 'black',
     },
     controls: {
         show: true,
@@ -293,16 +301,7 @@ let playlist = WaveformPlaylist.init({
     },
     zoomLevels: [500, 1000, 3000, 5000]
 });
-playlist.load([
-    {
-        src: "suv-godbless.mp3",
-        name: "SUV",
-        gain: 0.5
-    }
-]).then(function() {
-    console.log("playlist loaded shit");
-    playlist.initExporter();
-});
+playlist.initExporter();
 console.log("added playlist");
 
 /*
