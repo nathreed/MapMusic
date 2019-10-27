@@ -152,7 +152,7 @@ function getAudioConfigValues() {
 canvasDOM.onmousedown = function(e) {
     painting = true;
     const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-                                  e.clientY - canvasCoordinates.top);
+        e.clientY - canvasCoordinates.top);
 
     lineCoordinates.push(mouseLocation);
 
@@ -168,7 +168,7 @@ canvasDOM.onmousedown = function(e) {
 canvasDOM.onmousemove = function(e) {
     if(painting) {
         const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-                                      e.clientY - canvasCoordinates.top);
+            e.clientY - canvasCoordinates.top);
 
         // Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
         const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
@@ -250,7 +250,7 @@ document.getElementById("playStagedAudio").onclick = function(e) {
     let elevations = pathsAsElevations[pathsAsElevations.length - 1];
     let configValues = getAudioConfigValues();
     Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
-}
+};
 
 function normalizeElevations100(pathElevation) {
     //We take the array of elevations and we map them onto a 0-100 scale
@@ -287,8 +287,8 @@ function normalizeToMidiNotes(noteMin, noteMax, elevations) {
 let playlist = WaveformPlaylist.init({
     samplesPerPixel: 3000,
     mono: true,
-    waveHeight: 70,
-    container: document.getElementById('loopEditorContainer'),
+    waveHeight: 100,
+    container: document.getElementById("loopEditorContainer"),
     state: 'cursor',
     colors: {
         waveOutlineColor: '#3D3D3D',
@@ -408,6 +408,37 @@ function interpolateArray(data, newLength) {
     return resultData;
 }
 
+//Event listeners for keyboard controls
+document.addEventListener("keydown", function(e) {
+    const keyName = e.key;
+    //Spacebar: toggle play pause
+    if(keyName === " ") {
+        if(playlist.isPlaying()) {
+            isLooping = false;
+            ee.emit("pause");
+        } else {
+            ee.emit("play");
+        }
+    } else if(keyName === "s") {
+        isLooping = false;
+        ee.emit("stop");
+    } else if(keyName === "x") {
+        isLooping = false;
+        ee.emit("clear");
+    } else if(keyName === "c") {
+        //cursor
+        ee.emit("statechange", "cursor");
+        toggleActive(this);
+    } else if(keyName === "s") {
+        ee.emit("statechange", "select");
+        toggleActive(this);
+    } else if(keyName === "f") {
+        ee.emit("statechange", "shift");
+        toggleActive(this);
+    } else if(keyName === "t") {
+        ee.emit("trim");
+    }
+});
 },{"./music-gen":2,"leaflet":32,"leaflet-tilelayer-colorpicker":31,"waveform-playlist":75}],2:[function(require,module,exports){
 const Tone = require("tone");
 //const toWav = require("audiobuffer-to-wav");

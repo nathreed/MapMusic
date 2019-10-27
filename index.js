@@ -151,7 +151,7 @@ function getAudioConfigValues() {
 canvasDOM.onmousedown = function(e) {
     painting = true;
     const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-                                  e.clientY - canvasCoordinates.top);
+        e.clientY - canvasCoordinates.top);
 
     lineCoordinates.push(mouseLocation);
 
@@ -167,7 +167,7 @@ canvasDOM.onmousedown = function(e) {
 canvasDOM.onmousemove = function(e) {
     if(painting) {
         const mouseLocation = L.point(e.clientX - canvasCoordinates.left,
-                                      e.clientY - canvasCoordinates.top);
+            e.clientY - canvasCoordinates.top);
 
         // Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
         const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
@@ -249,7 +249,7 @@ document.getElementById("playStagedAudio").onclick = function(e) {
     let elevations = pathsAsElevations[pathsAsElevations.length - 1];
     let configValues = getAudioConfigValues();
     Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
-}
+};
 
 function normalizeElevations100(pathElevation) {
     //We take the array of elevations and we map them onto a 0-100 scale
@@ -286,8 +286,8 @@ function normalizeToMidiNotes(noteMin, noteMax, elevations) {
 let playlist = WaveformPlaylist.init({
     samplesPerPixel: 3000,
     mono: true,
-    waveHeight: 70,
-    container: document.getElementById('loopEditorContainer'),
+    waveHeight: 100,
+    container: document.getElementById("loopEditorContainer"),
     state: 'cursor',
     colors: {
         waveOutlineColor: '#3D3D3D',
@@ -300,8 +300,16 @@ let playlist = WaveformPlaylist.init({
     },
     zoomLevels: [500, 1000, 3000, 5000]
 });
+
+playlist.load([{
+    "src": "suv-godbless.mp3",
+    "name": "SUV"
+}]).then(function() {
+    console.log("loading done!");
+});
 playlist.initExporter();
 console.log("added playlist");
+
 
 /*
 PLAYLIST EVENT CONTROL BELOW HERE
@@ -382,6 +390,39 @@ $container.on("click", ".btn-download", function () {
     ee.emit('startaudiorendering', 'wav');
 });
 
+
+
+let audioStates = ["uninitialized", "loading", "decoding", "finished"];
+
+ee.on("audiorequeststatechange", function(state, src) {
+    var name = src;
+
+    if (src instanceof File) {
+        name = src.name;
+    }
+
+    console.log("Track " + name + " is in state " + audioStates[state]);
+});
+
+ee.on("loadprogress", function(percent, src) {
+    let name = src;
+
+    if (src instanceof File) {
+        name = src.name;
+    }
+
+    console.log("Track " + name + " has loaded " + percent + "%");
+});
+
+ee.on("audiosourcesloaded", function() {
+    console.log("Tracks have all finished decoding.");
+});
+
+ee.on("audiosourcesrendered", function() {
+    console.log("Tracks have been rendered");
+});
+
+
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
     const indexScalar = (data.length - 1) / (newLength - 1);
@@ -406,3 +447,35 @@ function interpolateArray(data, newLength) {
 
     return resultData;
 }
+
+//Event listeners for keyboard controls
+document.addEventListener("keydown", function(e) {
+    const keyName = e.key;
+    //Spacebar: toggle play pause
+    if(keyName === " ") {
+        if(playlist.isPlaying()) {
+            isLooping = false;
+            ee.emit("pause");
+        } else {
+            ee.emit("play");
+        }
+    } else if(keyName === "s") {
+        isLooping = false;
+        ee.emit("stop");
+    } else if(keyName === "x") {
+        isLooping = false;
+        ee.emit("clear");
+    } else if(keyName === "c") {
+        //cursor
+        ee.emit("statechange", "cursor");
+        toggleActive(this);
+    } else if(keyName === "s") {
+        ee.emit("statechange", "select");
+        toggleActive(this);
+    } else if(keyName === "f") {
+        ee.emit("statechange", "shift");
+        toggleActive(this);
+    } else if(keyName === "t") {
+        ee.emit("trim");
+    }
+});
