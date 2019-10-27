@@ -318,12 +318,6 @@ let playlist = WaveformPlaylist.init({
     zoomLevels: [500, 1000, 3000, 5000]
 });
 
-playlist.load([{
-    "src": "suv-godbless.mp3",
-    "name": "SUV"
-}]).then(function() {
-    console.log("loading done!");
-});
 playlist.initExporter();
 console.log("added playlist");
 
@@ -392,39 +386,6 @@ $container.on("click", ".btn-trim-audio", function() {
 $container.on("click", ".btn-download", function () {
     ee.emit('startaudiorendering', 'wav');
 });
-
-
-
-let audioStates = ["uninitialized", "loading", "decoding", "finished"];
-
-ee.on("audiorequeststatechange", function(state, src) {
-    var name = src;
-
-    if (src instanceof File) {
-        name = src.name;
-    }
-
-    console.log("Track " + name + " is in state " + audioStates[state]);
-});
-
-ee.on("loadprogress", function(percent, src) {
-    let name = src;
-
-    if (src instanceof File) {
-        name = src.name;
-    }
-
-    console.log("Track " + name + " has loaded " + percent + "%");
-});
-
-ee.on("audiosourcesloaded", function() {
-    console.log("Tracks have all finished decoding.");
-});
-
-ee.on("audiosourcesrendered", function() {
-    console.log("Tracks have been rendered");
-});
-
 
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
@@ -511,6 +472,205 @@ document.addEventListener("keydown", function(e) {
         }
     }
 });
+
+
+/*
+PROJECT FILE SAVE/LOAD
+ */
+
+//Utility
+function ab2str(buf) {
+    let arr = new Uint16Array(buf);
+    let str = "";
+    for(let i=0; i<arr.length; i++) {
+        str += String.fromCharCode(arr[i]);
+    }
+    return str;
+}
+function str2ab(str) {
+    let buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+    let bufView = new Uint16Array(buf);
+    for (let i=0, strLen=str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+    }
+    return buf;
+}
+
+
+$("#projSave").on("click", function() {
+    //Assemble the components for the file
+    //paths object
+
+    let plGJSON = pathsAsPolylines.map(x => x.toGeoJSON(8));
+    const paths = {
+        elevations: pathsAsElevations,
+        coordinates: pathsAsCoordinates,
+        polylines: plGJSON
+    };
+
+
+    const mapCenter = mymap.getCenter();
+    const mapZoom = mymap.getZoom();
+
+
+    const rawTracks = playlist.getInfo();
+    console.log(rawTracks);
+    let tracks = [];
+    let trackPromises = [];
+    rawTracks.forEach(function(x) {
+        //Need to convert the blob to base64
+        let reader = new window.FileReader();
+        trackPromises.push(new Promise(function(resolve, reject) {
+            reader.readAsDataURL(x.src);
+            reader.onloadend = function () {
+                let base64data = reader.result;
+
+                let trackObj = {
+                    blob64: base64data,
+                    blobSize: x.src.size,
+                    blobType: x.src.type,
+                    name: x.name,
+                    start: x.start,
+                    end: x.end,
+                    cuein: x.cuein,
+                    cueout: x.cueout
+                };
+                tracks.push(trackObj);
+                resolve();
+            }
+        }));
+    });
+
+    Promise.all(trackPromises).then(function() {
+        console.log("ALL TRACKS DONE!");
+        console.log(tracks);
+        //Final object
+        let save = {
+            filetype: "mapmusic-save",
+            paths: paths,
+            tracks: tracks,
+            mapCenter: mapCenter,
+            mapZoom: mapZoom,
+            savedPlaces: savedPlaces
+        };
+
+        //Write out
+        const data = JSON.stringify(save);
+        const ab = str2ab(data);
+        const fileBlob = new window.Blob([new DataView(ab)], {
+            type: "application/json"
+        });
+        let anchor = document.createElement('a');
+        document.body.appendChild(anchor);
+        anchor.style = 'display: none';
+        let url = window.URL.createObjectURL(fileBlob);
+        anchor.href = url;
+        anchor.download = 'proj.json';
+        anchor.click();
+        window.URL.revokeObjectURL(url);
+    });
+});
+
+$("#projLoad").on("click", function() {
+    //Show the choose file button
+    document.getElementById("chooseFileContainer").style.display = "inline"
+});
+
+document.getElementById("filePicker").addEventListener("change", handleFileSelect, false);
+function handleFileSelect(e) {
+    let files = e.target.files;
+    //Get files[0]
+    let projFile = files[0];
+    console.log(projFile);
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(projFile);
+    reader.onloadend = function() {
+        let abdata = reader.result;
+        //console.log(abdata);
+        let strData = ab2str(abdata);
+        //console.log(strData.substring(0,101));
+        try {
+            let projData = JSON.parse(strData);
+            if(projData["filetype"] !== "mapmusic-save") {
+                throw new Error("wrong filetype");
+            }
+            //Unpack the project data into its various components
+            //First set up the easy stuff
+            let mapCenter = projData.mapCenter;
+            let mapZoom = projData.mapZoom;
+            let fileSavedPlaces = projData.savedPlaces;
+
+            //Extract the polylines and convert back to leaflet obj, and the other path info
+            let leafletPolylines = projData.paths.polylines.map(x => L.geoJSON(x));
+            let filePathsAsElevations = projData.paths.elevations;
+            let filePathsAsCoordinates = projData.paths.coordinates;
+
+            //Extract the tracks
+            let trackData = [];
+            projData.tracks.forEach(function(trackObj) {
+                //Create a new blob from the base64 representation
+                //cut off the preamble/header thing
+                const byteCharacters = atob(trackObj.blob64.substring(22));
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const trackBlob = new Blob([byteArray], {
+                    type: trackObj.blobType
+                });
+
+                trackData.push({
+                    src: trackBlob,
+                    start: trackObj.start,
+                    end: trackObj.end,
+                    cuein: trackObj.cuein,
+                    cueout: trackObj.cueout,
+                    name: trackObj.name
+                })
+            });
+
+            //Now we have everything back how it should be. Load it all back in
+            //Clear the playlist first.
+            playlist.clear();
+            //Load tracks into playlist
+            playlist.load(trackData);
+            //Load paths in
+            this.pathsAsElevations = filePathsAsElevations;
+            this.pathsAsCoordinates = filePathsAsCoordinates;
+            //Clear the leaflet map
+            mymap.eachLayer(function (layer) {
+                if(layer === elevationData || layer === terrainVisible) {
+                    return;
+                }
+                mymap.removeLayer(layer);
+            });
+            //And add the polylines back
+            leafletPolylines.forEach(function(p) {
+                p.addTo(mymap);
+            });
+            //Load the saved places in
+            console.log(fileSavedPlaces);
+            mapToolbarChildren.locationSelect.innerHTML = "";
+            this.savedPlaces = fileSavedPlaces;
+            this.savedPlaces.forEach(addPlaceToPresetsDOM);
+            console.log(this.savedPlaces);
+            //Set the map center and zoom
+            mymap.center = mapCenter;
+            mymap.zoom = mapZoom;
+
+
+        } catch (e) {
+            console.log("NOT A MAP MUSIC PROJECT SAVE!");
+            console.log(e);
+
+        }
+
+
+        //Hide the choose file button now that we are done
+        document.getElementById("chooseFileContainer").style.display = "none";
+    }
+}
 },{"./music-gen":2,"leaflet":32,"leaflet-tilelayer-colorpicker":31,"waveform-playlist":75}],2:[function(require,module,exports){
 const Tone = require("tone");
 //const toWav = require("audiobuffer-to-wav");
