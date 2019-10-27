@@ -283,7 +283,7 @@ let playlist = WaveformPlaylist.init({
     container: document.getElementById('loopEditorContainer'),
     state: 'cursor',
     colors: {
-        waveOutlineColor: '#E0EFF1',
+        waveOutlineColor: '#3D3D3D',
         timeColor: 'grey',
         fadeColor: 'black'
     },

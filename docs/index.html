@@ -15,15 +15,15 @@
 			<div id="mapContainer">
 				<div id="mapToolbar" class="containerPadded">
 					Select mode:
-					<input type="radio" name="mode" id="panningMode" value="panning" checked><label for="panningMode" class="radioButton" >Panning</label>
-					<input type="radio" name="mode" id="drawingMode"value="drawing"><label for="drawingMode" class="radioButton" >Drawing</label>
+					<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton" >Panning</label>
+					<input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton" >Drawing</label>
 					&emsp;
 					Load a location:
-					<select name="locationSelect">
+					<select name="locationSelect" autocomplete="off">
 					</select> 
 					&emsp;
 					Bookmark current location:
-					<input type="text" name="saveLocationName" placeholder="Location Save Name">
+					<input type="text" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
 					<input type="button" name="saveLocationButton" value="Save">
 				</div>
 				<div id="mapWrapper">
@@ -64,7 +64,7 @@
 			<div id="loopEditorWrapper" class="containerPadded">
 				<div id="editorToolbarContainer">
 					<div class="buttonGroup">
-						<input type="button" value="Play" class="btn-play"><input type="button" value="Pause" class="btn-pause"><input type="button" value="Stop" class="btn-stop"><input type="button" value="Clear Tracks" class="btn-clear">
+						<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
 					</div>
 
 					<div class="buttonGroup">
@@ -76,8 +76,7 @@
 					<input type="button" value="Download" class="btn-download">
 
 				</div>
-				<div id="loopEditorContainer">
-				</div>
+				<div id="loopEditorContainer"></div>
 			</div>
 		</div>
 

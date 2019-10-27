@@ -157,6 +157,11 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 	grid-area: audioControls;
 }
 
+#stagedAudioLayer {
+	width: 100%;
+	height: 10vh;
+}
+
 /* Loop editor stuff */
 #loopEditorWrapper {
 	grid-area: loopEditor;
@@ -164,3 +169,15 @@ input[type="button"]:hover, .radioButton:hover input[type="button"]:focus, .radi
 	overflow: auto;
 }
 
+/* Overriding playlist graphics */
+.playlist .playlist-tracks {
+	background-color: transparent !important;
+}
+.playlist .channel-wrapper {
+	border-width: 1px 0;
+	border-color: #000000;
+	border-style: solid;
+}
+.playlist .controls header {
+	background-color: red;
+}
