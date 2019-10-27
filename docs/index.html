@@ -66,12 +66,12 @@
 			<label for="highNote">High note:</label> <input type="number" name="highNote" id="highNote" class="shortNumber" value="84" min="0" max="127" autocomplete="off">
 			<br>
 			<label for="audioLengthScalingMode">Audio length editing mode:</label>
-			<select name="audioLengthScalingMode" id="audioLengthScalingMode">
+			<select name="audioLengthScalingMode" id="audioLengthScalingMode" autocomplete="off">
 				<option value="totalLength">Total length</option>
 				<option value="noteDuration">Note duration</option>
 			</select>
 			<br>
-			<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" class="shortNumber" value="8.0" min="0.0" autocomplete="off"> seconds
+			<label for="audioLength">Length:</label> <input type="number" name="audioLength" id="audioLength" class="shortNumber" value="8.0" min="0.0" step="0.005" autocomplete="off"> seconds
 			<br>
 			<input type="checkbox" name="sampleToPredicate" id="sampleToPredicate" checked autocomplete="off"><label for="sampleToPredicate">Sample to: <input type="number" class="shortNumber" name="sampleTo" id="sampleTo" value="50" min="0" autocomplete="off"> notes?</label>
 			<br><br>
