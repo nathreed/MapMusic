@@ -108,8 +108,13 @@ window.onresize = function(e){
     canvasCoordinates = canvasDOM.getBoundingClientRect();
 
     // Code for later stuff
-    stagedAudioCanvasDOM.width = stagedAudioCanvasDOM.clientWidth;
-    stagedAudioCanvasDOM.height = stagedAudioCanvasDOM.clientHeight;
+    stagedAudioCanvasDOM.width = audioControlsContainer.offsetWidth - 20; // 10px padding
+    stagedAudioCanvasDOM.height = window.innerHeight / 10; // 10 vh
+
+    // Redraw on resize
+    if(pathsAsElevations.length > 0){
+        renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
+    }
 };
 window.onresize(); // Call once to set initial values for coordinate systems
 
@@ -229,17 +234,7 @@ canvasDOM.onmouseup = function(e) {
             Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, elevations), configValues);
         }
 
-        // Plot the elevation map
-        let histogramValues = interpolateArray(elevations, Math.floor(stagedAudioCanvasDOM.width));
-        const maxHeight =  Math.max( ...histogramValues);
-        const minHeight =  Math.min( ...histogramValues);
-        stagedAudioCanvasContext.clearRect(0, 0, stagedAudioCanvasDOM.width, stagedAudioCanvasDOM.height);
-        histogramValues.forEach((height, index) => {
-            let normalizedHeight = (height - minHeight)/(maxHeight - minHeight);
-            stagedAudioCanvasContext.fillStyle = "#fff";
-            stagedAudioCanvasContext.fillRect(index, stagedAudioCanvasDOM.height * (1 - normalizedHeight), 1, stagedAudioCanvasDOM.height * normalizedHeight);
-        });
-
+        renderElevationHistogram(elevations);
     }
 
     // Reset canvas painting stuff
@@ -248,6 +243,20 @@ canvasDOM.onmouseup = function(e) {
     painting = false;
     lineCoordinates = [];
 };
+
+// Render canvas with the height histogram
+function renderElevationHistogram(elevations){
+    // Plot the elevation map
+    let histogramValues = interpolateArray(elevations, Math.floor(stagedAudioCanvasDOM.width));
+    const maxHeight =  Math.max( ...histogramValues);
+    const minHeight =  Math.min( ...histogramValues);
+    stagedAudioCanvasContext.clearRect(0, 0, stagedAudioCanvasDOM.width, stagedAudioCanvasDOM.height);
+    histogramValues.forEach((height, index) => {
+        let normalizedHeight = (height - minHeight)/(maxHeight - minHeight);
+        stagedAudioCanvasContext.fillStyle = "#fff";
+        stagedAudioCanvasContext.fillRect(index, stagedAudioCanvasDOM.height * (1 - normalizedHeight), 1, stagedAudioCanvasDOM.height * normalizedHeight);
+    });
+}
 
 // Audio config options pane submit action
 document.getElementById("addStagedAudio").onclick = function(e) {
@@ -400,7 +409,6 @@ ee.on('audiorenderingfinished', function (type, data) {
         anchor.remove();
     }
 });
-
 
 // Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
 function interpolateArray(data, newLength) {
