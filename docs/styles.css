@@ -190,6 +190,11 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	overflow: auto;
 }
 
+/* Cash Money Stuff */
+#checkShowWrapper {
+	background-color: #ffffff;
+}
+
 /* Overriding playlist graphics */
 .playlist .playlist-tracks {
 	background-color: transparent;

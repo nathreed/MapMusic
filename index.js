@@ -3,11 +3,11 @@ require("leaflet-tilelayer-colorpicker");
 const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
 const numConverter = require("number-to-words");
+const checkSVG = require("./fakeCheckSVG.js");
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
 // Map toolbar handling
 let mapToolbarChildren = document.getElementById("mapToolbar").children;
-
 // Process panning/drawing toggle
 document.getElementById("panningMode").oninput = function(e){
 	// Set to panning mode by removing click events on the canvas
@@ -180,12 +180,21 @@ $("#cashGo").on("click", function() {
 
 
 	let sendBtn = document.getElementById("sendMoney");
-	if(sendBtn.checked) {
-		//Sending money, generate check
-	} else {
+
+    // Finalize the SVG
+    let svgString = checkSVG.svgString.replace("\{svgDollarNumberText\}", amount);
+    svgString = svgString.replace("\{svgDollarWordsText\}", finalAmtString);
+    svgString = svgString.replace("\{svgDateText\}", dateString);
+    if(sendBtn.checked) {
+        svgString = svgString.replace("\{svgSenderText\}", senderName);
+        svgString = svgString.replace("\{svgDestinationText\}", toName);
+      } else {
 		//Requesting money, swap names on check
+        svgString = svgString.replace("\{svgSenderText\}", toName);
+        svgString = svgString.replace("\{svgDestinationText\}", senderName);
 	}
 
+    document.getElementById("checkShowWrapper").innerHTML = svgString;
 });
 
 // Audio config preview canvas
@@ -206,7 +215,7 @@ function resizeCanvasesAndRedrawHistogram(resizeEvent){
 	canvasDOM.height = canvasDOM.offsetHeight;
 	canvasCoordinates = canvasDOM.getBoundingClientRect();
 
-	// // Code for histogram window resizing
+	// Code for histogram window resizing
 	// stagedAudioCanvasDOM.width = audioControlsWrapper.offsetWidth - 20; // 10px padding
 	// stagedAudioCanvasDOM.height = window.innerHeight / 10; // 10 vh
 
