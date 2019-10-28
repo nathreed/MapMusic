@@ -7,8 +7,8 @@
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
 		  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-		  crossorigin=""/>
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		  crossorigin="">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 <div id="wholeUIContainer">
@@ -80,7 +80,7 @@
 			</div>
 		</div>
 
-		<div id="bankingControlsWrapper" style="display:none">
+		<div id="bankingControlsWrapper" class="hide">
 			<h4>Send or Request Money</h4>
 			<br>
 			Send/Request (select with elevation):
@@ -126,7 +126,7 @@
 				    <input type="button" value="Save Project File" id="projSave"><!--
 				 --><input type="button" value="Load Project File" id="projLoad">
 				</div>
-				<div id="chooseFileContainer" style="display: none">
+				<div id="chooseFileContainer" class="hide">
 					<input type="file" id="filePicker" name="files[]">
 				</div>
 
@@ -136,7 +136,7 @@
 			<div id="loopEditorContainer"></div>
 		</div>
 
-		<div id="checkShowWrapper" style="display: none">
+		<div id="checkShowWrapper" class="hide">
 			<!--check svg goes here, dynamically generated...-->
 		</div>
 	</div>

@@ -555,15 +555,7 @@ $id("btn-download").onclick = function(e) {
 
 ee.on('audiorenderingfinished', function (type, data) {
 	if(type === 'wav'){
-		// Make a download link and click it, then make it all go away
-		let anchor = document.createElement('a');
-		anchor.style = 'display: none';
-		anchor.href = window.URL.createObjectURL(data);
-		document.body.appendChild(anchor);
-		anchor.download = 'audio.wav';
-		anchor.click();
-		window.URL.revokeObjectURL(anchor.href);
-		anchor.remove();
+		download(data, "audio.wav");
 	}
 });
 
@@ -594,7 +586,6 @@ function interpolateArray(data, newLength) {
 
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
-	console.log("TAGNAME:", document.activeElement.tagName);
 	if(document.activeElement.tagName.toLowerCase() === "input") {
 		return; //no keyboard shortcuts while typing or having anything selected, just when the body is active
 	}
@@ -656,26 +647,6 @@ document.addEventListener("keydown", function(e) {
 /*
 PROJECT FILE SAVE/LOAD
  */
-
-//Utility
-function ab2str(buf) {
-	let arr = new Uint16Array(buf);
-	let str = "";
-	for(let i=0; i<arr.length; i++) {
-		str += String.fromCharCode(arr[i]);
-	}
-	return str;
-}
-function str2ab(str) {
-	let buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-	let bufView = new Uint16Array(buf);
-	for (let i=0, strLen=str.length; i < strLen; i++) {
-		bufView[i] = str.charCodeAt(i);
-	}
-	return buf;
-}
-
-
 $id("projSave").onclick = function(e) {
 	//Assemble the components for the file
 	//paths object
@@ -687,10 +658,8 @@ $id("projSave").onclick = function(e) {
 		polylines: plGJSON
 	};
 
-
 	const mapCenter = mymap.getCenter();
 	const mapZoom = mymap.getZoom();
-
 
 	const rawTracks = playlist.getInfo();
 	console.log(rawTracks);
@@ -735,18 +704,10 @@ $id("projSave").onclick = function(e) {
 
 		//Write out
 		const data = JSON.stringify(save);
-		const ab = str2ab(data);
-		const fileBlob = new window.Blob([new DataView(ab)], {
+		const fileBlob = new window.Blob([data], {
 			type: "application/json"
 		});
-		let anchor = document.createElement('a');
-		document.body.appendChild(anchor);
-		anchor.style = 'display: none';
-		let url = window.URL.createObjectURL(fileBlob);
-		anchor.href = url;
-		anchor.download = 'proj.json';
-		anchor.click();
-		window.URL.revokeObjectURL(url);
+		download(fileBlob, "prop.json");
 	});
 };
 
@@ -761,11 +722,10 @@ $id("filePicker").onchange = function(e) {
 	let projFile = files[0];
 	console.log(projFile);
 	let reader = new FileReader();
-	reader.readAsArrayBuffer(projFile);
+	reader.readAsText(projFile);
 	reader.onloadend = function() {
-		let abdata = reader.result;
-		//console.log(abdata);
-		let strData = ab2str(abdata);
+		console.log(reader.result);
+		let strData = reader.result;
 		//console.log(strData.substring(0,101));
 		try {
 			let projData = JSON.parse(strData);
@@ -852,4 +812,17 @@ $id("filePicker").onchange = function(e) {
 // JankQuery (We repeat this so much it's painful)
 function $id(id) {
     return document.getElementById(id);
+}
+
+// Download some data automatically
+function download(data, filename){
+    // Make a download link and click it, then make it all go away
+    let anchor = document.createElement('a');
+    anchor.style = 'display: none';
+    anchor.href = window.URL.createObjectURL(data);
+    document.body.appendChild(anchor);
+    anchor.download = filename;
+    anchor.click();
+    window.URL.revokeObjectURL(anchor.href);
+    anchor.remove();
 }
