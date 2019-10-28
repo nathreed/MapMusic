@@ -88,7 +88,6 @@ let elevationData = L.tileLayer.colorPicker(urlRGBheight, {
 //mymap.dragging.disable(); //disable drag for now
 
 // Data for the paths
-pathsAsCoordinates = [];
 pathsAsPolylines = [];
 pathsAsElevations = [];
 
@@ -118,22 +117,21 @@ $id("cashTab").onclick = function() {
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
 //This will be determined based on which tab is selected on top
 function elevationDataDispatch(elevations) {
-	let musicTab = $id("musicTab");
-	if(musicTab.checked) {
-		//Music tab is selected, dispatch to music code
-		musicPlay(elevations);
+	if($id("musicTab").checked) {
+		//Music tab is selected, dispatch to music code (if setting to play automatically)
+		if(getAudioConfigValues().playLivePreview) {
+			playMusic(elevations);
+		}
 	} else {
 		//Cash tab is selected, dispatch to cash code
 		cash(elevations);
 	}
 }
 
-function musicPlay(elevations) {
+function playMusic(elevations) {
 	//Get the config values from the page
 	let configValues = getAudioConfigValues();
-	if(configValues.playLivePreview) {
-		Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
-	}
+	Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
 }
 
 function cash(elevations) {
@@ -345,9 +343,6 @@ canvasDOM.onmouseup = function(e) {
 			return mymap.containerPointToLatLng(point);
 		});
 
-		// Add GeoJSON to the map (and store the path in the polylines list)
-		pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
-
 		// Points to elevation data
 		const elevations = coordinates.map((point) => {
 			const color = elevationData.getColor(point);
@@ -361,7 +356,7 @@ canvasDOM.onmouseup = function(e) {
 
 		// Add elevation data and path to arrays
 		pathsAsElevations.push(elevations);
-		pathsAsCoordinates.push(coordinates);
+		pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
 
 		elevationDataDispatch(elevations);
 
@@ -405,9 +400,7 @@ $id("addStagedAudio").onclick = function(e) {
 
 // Audio config options pane play audio again action
 $id("playStagedAudio").onclick = function(e) {
-	let elevations = pathsAsElevations[pathsAsElevations.length - 1];
-	let configValues = getAudioConfigValues();
-	Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
+	playMusic(pathsAsElevations[pathsAsElevations.length - 1])
 };
 
 function normalizeToMidiNotes(noteMin, noteMax, sampleTo, sampleToPredicate, elevations) {
@@ -654,7 +647,6 @@ $id("projSave").onclick = function(e) {
 	let plGJSON = pathsAsPolylines.map(x => x.toGeoJSON(8));
 	const paths = {
 		elevations: pathsAsElevations,
-		coordinates: pathsAsCoordinates,
 		polylines: plGJSON
 	};
 
@@ -702,12 +694,12 @@ $id("projSave").onclick = function(e) {
 			savedPlaces: savedPlaces
 		};
 
-		//Write out
+		//Write out data as JSON
 		const data = JSON.stringify(save);
 		const fileBlob = new window.Blob([data], {
 			type: "application/json"
 		});
-		download(fileBlob, "prop.json");
+		download(fileBlob, "proj.json");
 	});
 };
 
@@ -724,9 +716,7 @@ $id("filePicker").onchange = function(e) {
 	let reader = new FileReader();
 	reader.readAsText(projFile);
 	reader.onloadend = function() {
-		console.log(reader.result);
 		let strData = reader.result;
-		//console.log(strData.substring(0,101));
 		try {
 			let projData = JSON.parse(strData);
 			if(projData["filetype"] !== "mapmusic-save") {
@@ -741,7 +731,6 @@ $id("filePicker").onchange = function(e) {
 			//Extract the polylines and convert back to leaflet obj, and the other path info
 			let leafletPolylines = projData.paths.polylines.map(x => L.geoJSON(x));
 			let filePathsAsElevations = projData.paths.elevations;
-			let filePathsAsCoordinates = projData.paths.coordinates;
 
 			//Extract the tracks
 			let trackData = [];
@@ -775,7 +764,6 @@ $id("filePicker").onchange = function(e) {
 			playlist.load(trackData);
 			//Load paths in
 			this.pathsAsElevations = filePathsAsElevations;
-			this.pathsAsCoordinates = filePathsAsCoordinates;
 			//Clear the leaflet map
 			mymap.eachLayer(function (layer) {
 				if(layer === elevationData || layer === terrainVisible) {
