@@ -13,15 +13,15 @@ const checkSVG = require("./fakeCheckSVG.js");
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
 // Map toolbar handling
-let mapToolbarChildren = document.getElementById("mapToolbar").children;
+let mapToolbarChildren = $id("mapToolbar").children;
 // Process panning/drawing toggle
-document.getElementById("panningMode").oninput = function(e){
+$id("panningMode").oninput = function(e){
 	// Set to panning mode by removing click events on the canvas
 	console.log("setting pan mode");
 	canvasDOM.classList.add("noInteraction");
 };
 
-document.getElementById("drawingMode").oninput = function(e){
+$id("drawingMode").oninput = function(e){
 	console.log("setting drawmode");
 	canvasDOM.classList.remove("noInteraction");
 };
@@ -99,32 +99,32 @@ pathsAsPolylines = [];
 pathsAsElevations = [];
 
 //Switch between music tab and cash tab
-$("#musicTab").on("click", function() {
-	document.getElementById("bankingControlsWrapper").style.display = "none";
-	document.getElementById("audioControlsWrapper").style.display = "";
+$id("musicTab").onclick = function() {
+	$id("bankingControlsWrapper").style.display = "none";
+	$id("audioControlsWrapper").style.display = "";
 
-	document.getElementById("editorHideWrapper").style.display = "";
-    document.getElementById("checkShowWrapper").style.display = "none";
-    document.getElementById("loopEditorWrapper").style.overflow = "auto";
+	$id("editorHideWrapper").style.display = "";
+    $id("checkShowWrapper").style.display = "none";
+    $id("loopEditorWrapper").style.overflow = "auto";
 
 	//We have to do this to not mess up the drawing
 	resizeCanvasesAndRedrawHistogram()
-});
+};
 
-$("#cashTab").on("click", function() {
-	document.getElementById("bankingControlsWrapper").style.display = "";
-	document.getElementById("audioControlsWrapper").style.display = "none";
+$id("cashTab").onclick = function() {
+	$id("bankingControlsWrapper").style.display = "";
+	$id("audioControlsWrapper").style.display = "none";
 
-	document.getElementById("editorHideWrapper").style.display = "none";
-	document.getElementById("checkShowWrapper").style.display = "";
-    document.getElementById("loopEditorWrapper").style.overflow = "none";
+	$id("editorHideWrapper").style.display = "none";
+	$id("checkShowWrapper").style.display = "";
+    $id("loopEditorWrapper").style.overflow = "none";
 
 	resizeCanvasesAndRedrawHistogram()
-});
+};
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
 //This will be determined based on which tab is selected on top
 function elevationDataDispatch(elevations) {
-	let musicTab = document.getElementById("musicTab");
+	let musicTab = $id("musicTab");
 	if(musicTab.checked) {
 		//Music tab is selected, dispatch to music code
 		musicPlay(elevations);
@@ -148,24 +148,24 @@ function cash(elevations) {
 	//If the general trend is uphill, we are requesting
 	if(elevations[0] >= elevations[elevations.length - 1]) {
 		//First is greater than the last, that means downhill -> sending
-		document.getElementById("sendMoney").checked = true;
+		$id("sendMoney").checked = true;
 	} else {
 		//Uphill -> requesting
-		document.getElementById("reqMoney").checked = true;
+		$id("reqMoney").checked = true;
 	}
 
 	//Next determine the amount, this is the abs of the first minus last
 	let amount = Math.abs(elevations[0] - elevations[elevations.length - 1]);
-	document.getElementById("cashAmount").value = amount.toFixed(2);
+	$id("cashAmount").value = amount.toFixed(2);
 }
 
 //Cash go button - modify SVG
-$("#cashGo").on("click", function() {
+$id("cashGo").onclick = function() {
 	//Grab the names from the page
 	//And the amount, whether sending or receiving, etc
-	let senderName = $("#yourName").val();
-	let toName = $("#cashName").val();
-	let amount = $("#cashAmount").val();
+	let senderName = $id("yourName").value;
+	let toName = $id("cashName").value;
+	let amount = $id("cashAmount").value;
 
 	//Check to see if it's filled in
 	//if(amount === "") return;
@@ -187,7 +187,7 @@ $("#cashGo").on("click", function() {
 
 
 
-	let sendBtn = document.getElementById("sendMoney");
+	let sendBtn = $id("sendMoney");
 
     // Finalize the SVG
     let svgString = checkSVG.svgString.replace("\{svgDollarNText\}", amount);
@@ -202,16 +202,16 @@ $("#cashGo").on("click", function() {
         svgString = svgString.replace("\{svgDestinationText\}", senderName);
 	}
 
-    document.getElementById("checkShowWrapper").innerHTML = svgString;
-});
+    $id("checkShowWrapper").innerHTML = svgString;
+};
 
 // Audio config preview canvas
-let stagedAudioCanvasDOM = document.getElementById("stagedAudioCanvas");
+let stagedAudioCanvasDOM = $id("stagedAudioCanvas");
 let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
 
 // Map layer canvas
-let mapContainerDOM = document.getElementById("mapWrapper");
-canvasDOM = document.getElementById("drawingLayer");
+let mapContainerDOM = $id("mapWrapper");
+canvasDOM = $id("drawingLayer");
 let canvasContext = canvasDOM.getContext("2d");
 
 // Update each size and redraw on window resize
@@ -245,24 +245,23 @@ function getAudioConfigValues() {
 	//Grab the values out of each thing that we want
 	//Right now we want high note, low note, and duration information
 	//High note
-	let highNote = parseInt($("#highNote").val());
-	let lowNote = parseInt($("#lowNote").val());
+	let highNote = parseInt($id("highNote").value);
+	let lowNote = parseInt($id("lowNote").value);
 
-	let scalingType = $("#audioLengthScalingMode").val();
-	let durationValue = parseFloat($("#audioLength").val());
+	let scalingType = $id("audioLengthScalingMode").value;
+	let durationValue = parseFloat($id("audioLength").value);
 
-	let playLivePreview = document.getElementById("playLivePreview").checked;
+	let playLivePreview = $id("playLivePreview").checked;
 
-	let soundName = $("#soundName").val();
+	let soundName = $id("soundName").value;
 
-	let sampleTo = $("#sampleTo").val();
-	let sampleToPredicate = document.getElementById("sampleToPredicate").checked;
+	let sampleTo = $id("sampleTo").value;
+	let sampleToPredicate = $id("sampleToPredicate").checked;
 
 
 	let synth;
-	let classicSynth = document.getElementById("classicSynth");
-	let duoSynth = document.getElementById("duoSynth");
-	if(classicSynth.checked) {
+	let classicSynth = $id("classicSynth").checked;
+	if(classicSynth) {
 		synth = "classic"
 	} else {
 		synth = "duo"
@@ -297,12 +296,12 @@ function getAudioConfigValues() {
 	}
 }
 
-document.getElementById("sampleToPredicate").onclick = function(e){
+$id("sampleToPredicate").onclick = function(e){
 	console.log("toggling resampling.")
 	if(this.checked){
-		document.getElementById("sampleTo").disabled = false;
+		$id("sampleTo").disabled = false;
 	} else {
-		document.getElementById("sampleTo").disabled = true;
+		$id("sampleTo").disabled = true;
 	}
 }
 
@@ -397,7 +396,7 @@ function renderElevationHistogram(elevations){
 }
 
 // Audio config options pane submit action
-document.getElementById("addStagedAudio").onclick = function(e) {
+$id("addStagedAudio").onclick = function(e) {
 	let elevations = pathsAsElevations[pathsAsElevations.length - 1];
 	let configValues = getAudioConfigValues();
 	Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues, function (blob) {
@@ -411,7 +410,7 @@ document.getElementById("addStagedAudio").onclick = function(e) {
 };
 
 // Audio config options pane play audio again action
-document.getElementById("playStagedAudio").onclick = function(e) {
+$id("playStagedAudio").onclick = function(e) {
 	let elevations = pathsAsElevations[pathsAsElevations.length - 1];
 	let configValues = getAudioConfigValues();
 	Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
@@ -448,7 +447,7 @@ let playlist = WaveformPlaylist.init({
 	samplesPerPixel: 3000,
 	mono: true,
 	waveHeight: 100,
-	container: document.getElementById("loopEditorContainer"),
+	container: $id("loopEditorContainer"),
 	state: 'cursor',
 	colors: {
 		waveOutlineColor: '#3D3D3D',
@@ -471,7 +470,6 @@ PLAYLIST EVENT CONTROL BELOW HERE
  */
 
 let ee = playlist.getEventEmitter();
-let $container = $("body");
 let startTime = 0;
 let endTime = 0;
 let audioPos = 0;
@@ -480,10 +478,10 @@ let playoutPromises;
 
 function updateSelect(start, end) {
 	if (start < end) {
-		$('.btn-trim-audio').removeClass('disabled');
+		$id("btn-trim-audio").classList.remove('disabled');
 	}
 	else {
-		$('.btn-trim-audio').addClass('disabled');
+		$id("btn-trim-audio").classList.add('disabled');
 	}
 
 	startTime = start;
@@ -492,44 +490,43 @@ function updateSelect(start, end) {
 
 updateSelect(startTime, endTime);
 
-$container.on("click", ".btn-play", function() {
+$id("btn-play").onclick = function(e){
 	ee.emit("play");
-});
-
-$container.on("click", ".btn-pause", function() {
+};
+$id("btn-pause").onclick = function(e){
 	isLooping = false;
 	ee.emit("pause");
-});
+};
 
-$container.on("click", ".btn-stop", function() {
+$id("btn-stop").onclick =  function(e) {
 	isLooping = false;
 	ee.emit("stop");
-});
+};
 
-$container.on("click", ".btn-clear", function() {
+$id("btn-clear").onclick = function(e) {
 	isLooping = false;
 	ee.emit("clear");
-});
+};
 
 //Drag and Drop support
-$container.on("dragenter", ".track-drop", function(e) {
+$id("track-drop").ondragenter = function(e) {
 	console.log("DRAG ENTER!");
 	e.preventDefault();
 	e.target.classList.add("drag-enter");
-});
+};
 
-$container.on("dragover", ".track-drop", function(e) {
+$id("track-drop").ondragover = function(e) {
 	console.log("DRAG OVER!");
 	e.preventDefault();
-});
+};
 
-$container.on("dragleave", ".track-drop", function(e) {
+$id("track-drop").ondragleave = function(e) {
 	console.log("DRAG LEAVE!");
 	e.preventDefault();
 	e.target.classList.remove("drag-enter");
-});
+};
 
-$container.on("drop", ".track-drop", function(e) {
+$id("track-drop").drop = function(e) {
 	console.log("DROP!");
 	e.preventDefault();
 	e.target.classList.remove("drag-enter");
@@ -539,31 +536,31 @@ $container.on("drop", ".track-drop", function(e) {
 	for (let i = 0; i < dropEvent.dataTransfer.files.length; i++) {
 		ee.emit("newtrack", dropEvent.dataTransfer.files[i]);
 	}
-});
+};
 
 
-document.getElementById("btn-cursor").onclick = function(e) {
+$id("btn-cursor").onclick = function(e) {
 	ee.emit("statechange", "cursor");
 };
 
-document.getElementById("btn-select").onclick = function(e) {
+$id("btn-select").onclick = function(e) {
 	ee.emit("statechange", "select");
 };
 
-document.getElementById("btn-shift").onclick = function(e) {
+$id("btn-shift").onclick = function(e) {
 	ee.emit("statechange", "shift");
 };
 
-$container.on("click", ".btn-trim-audio", function() {
+$id("btn-trim-audio").onclick = function(e) {
 	ee.emit("trim");
-});
+};
 
-$container.on("click", ".btn-download", function () {
+$id("btn-download").onclick = function(e) {
 	ee.emit('startaudiorendering', 'wav');
-});
+};
 
 ee.on('audiorenderingfinished', function (type, data) {
-	if(type == 'wav'){
+	if(type === 'wav'){
 		// Make a download link and click it, then make it all go away
 		let anchor = document.createElement('a');
 		anchor.style = 'display: none';
@@ -622,12 +619,12 @@ document.addEventListener("keydown", function(e) {
 			// P: map panning mode
 			// Set to panning mode by removing click events on the canvas
 			canvasDOM.classList.add("noInteraction");
-			document.getElementById("panningMode").checked = true;
+			$id("panningMode").checked = true;
 			break;
 		case "d":
 			// D: map drawing mode
 			canvasDOM.classList.remove("noInteraction");
-			document.getElementById("drawingMode").checked = true;
+			$id("drawingMode").checked = true;
 			break;
 		case "s":
 			// S: stop playlist audio
@@ -642,17 +639,17 @@ document.addEventListener("keydown", function(e) {
 		case "c":
 			// C: cursor playlist tool
 			ee.emit("statechange", "cursor");
-			document.getElementById("btn-cursor").checked = true;
+			$id("btn-cursor").checked = true;
 			break;
 		case "l":
 			// L: select playlist tool
 			ee.emit("statechange", "select");
-			document.getElementById("btn-select").checked = true;
+			$id("btn-select").checked = true;
 			break;
 		case "f":
 			// F: shift playlist tool
 			ee.emit("statechange", "shift");
-			document.getElementById("btn-shift").checked = true;
+			$id("btn-shift").checked = true;
 			break;
 		case "t":
 			// T: trip selection in playlist
@@ -685,7 +682,7 @@ function str2ab(str) {
 }
 
 
-$("#projSave").on("click", function() {
+$id("projSave").onclick = function(e) {
 	//Assemble the components for the file
 	//paths object
 
@@ -757,15 +754,14 @@ $("#projSave").on("click", function() {
 		anchor.click();
 		window.URL.revokeObjectURL(url);
 	});
-});
+};
 
-$("#projLoad").on("click", function() {
+$id("projLoad").onclick = function(e) {
 	//Show the choose file button
-	document.getElementById("chooseFileContainer").style.display = "inline";
-});
+	$id("chooseFileContainer").style.display = "inline";
+};
 
-document.getElementById("filePicker").addEventListener("change", handleFileSelect, false);
-function handleFileSelect(e) {
+$id("filePicker").onchange = function(e) {
 	let files = e.target.files;
 	//Get files[0]
 	let projFile = files[0];
@@ -854,8 +850,14 @@ function handleFileSelect(e) {
 		}
 
 		//Hide the choose file button now that we are done
-		document.getElementById("chooseFileContainer").style.display = "none";
+		$id("chooseFileContainer").style.display = "none";
 	}
+}
+
+
+// JankQuery (We repeat this so much it's painful)
+function $id(id) {
+    return document.getElementById(id);
 }
 },{"./fakeCheckSVG.js":1,"./music-gen":3,"leaflet":33,"leaflet-tilelayer-colorpicker":32,"number-to-words":37,"waveform-playlist":77}],3:[function(require,module,exports){
 const Tone = require("tone");

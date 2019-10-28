@@ -16,8 +16,8 @@
 		<div id="mapToolbar" class="containerPadded">
 			Select mode:
 			<div class="buttonGroup">
-				<input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!--
-					 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
+			    <input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!--
+			 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
 			</div>
 			&emsp;
 			Load a location:
@@ -37,8 +37,8 @@
 		<div id="musicCashTabWrapper">
 			Controls:
 			<div class="buttonGroup">
-				<input type="radio" name="tab" id="musicTab" value="music" autocomplete="off" checked><label for="musicTab" class="radioButton">Music</label><!--
-					 --><input type="radio" name="tab" id="cashTab" value="cash" autocomplete="off"><label for="cashTab" class="radioButton">Ca$h Money</label>
+			    <input type="radio" name="tab" id="musicTab" value="music" autocomplete="off" checked><label for="musicTab" class="radioButton">Music</label><!--
+			 --><input type="radio" name="tab" id="cashTab" value="cash" autocomplete="off"><label for="cashTab" class="radioButton">Ca$h Money</label>
 			</div>
 		</div>
 		<br>
@@ -53,8 +53,8 @@
 			<br>
 			Synth:
 			<div class="buttonGroup">
-				<input type="radio" name="synth" id="classicSynth" value="classic" autocomplete="off" checked><label for="classicSynth" class="radioButton">Classic</label><!--
-					 --><input type="radio" name="synth" id="duoSynth" value="duo" autocomplete="off"><label for="duoSynth" class="radioButton">Duo</label>
+			    <input type="radio" name="synth" id="classicSynth" value="classic" autocomplete="off" checked><label for="classicSynth" class="radioButton">Classic</label><!--
+			 --><input type="radio" name="synth" id="duoSynth" value="duo" autocomplete="off"><label for="duoSynth" class="radioButton">Duo</label>
 			</div>
 			<br>
 			<br>
@@ -106,28 +106,31 @@
 		<div id="editorHideWrapper">
 			<div id="editorToolbarContainer" class="containerPadded">
 				<div class="buttonGroup">
-					<input type="button" value="▶ Play" class="btn-play"><input type="button" value="⏸ Pause" class="btn-pause"><input type="button" value="⏹ Stop" class="btn-stop"><input type="button" value="🗙 Clear Tracks" class="btn-clear">
+				    <input type="button" value="▶ Play" id="btn-play"><!-- 
+				 --><input type="button" value="⏸ Pause" id="btn-pause"><!-- 
+				 --><input type="button" value="⏹ Stop" id="btn-stop"><!-- 
+				 --><input type="button" value="🗙 Clear Tracks" id="btn-clear">
 				</div>
 
 				<div class="buttonGroup">
-					<input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
-			 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
-			 --><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
+				    <input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
+				 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
+				 --><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
 				</div>
 
-				<input type="button" value="Trim" class="btn-trim-audio">
+				<input type="button" value="Trim" id="btn-trim-audio">
 
-				<input type="button" value="Download" class="btn-download">
+				<input type="button" value="Download" id="btn-download">
 
 				<div class="buttonGroup">
-					<input type="button" value="Save Project File" id="projSave"><!--
-			 --><input type="button" value="Load Project File" id="projLoad">
+				    <input type="button" value="Save Project File" id="projSave"><!--
+				 --><input type="button" value="Load Project File" id="projLoad">
 				</div>
 				<div id="chooseFileContainer" style="display: none">
 					<input type="file" id="filePicker" name="files[]">
 				</div>
 
-				<div class="track-drop">Drop audio files here</div>
+				<div id="track-drop">Drop audio files here</div>
 
 			</div>
 			<div id="loopEditorContainer"></div>
@@ -139,7 +142,6 @@
 	</div>
 </div>
 
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="dist/index.js"></script>
 </body>
 </html>
