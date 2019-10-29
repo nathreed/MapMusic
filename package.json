@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "browserify": "rm -rf docs/dist && mkdir docs/dist && browserify index.js > docs/dist/index.js",
+    "browserify": "browserify index.js > docs/dist/index.js",
     "sass": "sass node_modules/waveform-playlist/styles/playlist.scss docs/dist/playlist.css"
   },
   "repository": {
@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "browserify": "^16.5.0",
-    "sass": "^1.23.1",
-    "svgify": "0.0.0"
+    "sass": "^1.23.1"
   }
 }

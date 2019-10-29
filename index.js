@@ -28,7 +28,7 @@ function addPlaceToPresetsDOM(place, index){
 	mapToolbarChildren.locationSelect.add(option);
 	savedPlaces[index] = place;
 }
-savedPlaces = [
+let savedPlaces = [
 	{name: "Grand Canyon", coordinates: [35.81025936, -113.6302593801], zoom: 11},
 	{name: "Vancouver Mountains", coordinates: [49.3822072, -123.1363749], zoom: 12},
 	{name: "University of Rochester", coordinates: [43.1289624, -77.629125], zoom: 16},
@@ -93,24 +93,22 @@ pathsAsElevations = [];
 
 //Switch between music tab and cash tab
 $id("musicTab").onclick = function() {
-	$id("bankingControlsWrapper").style.display = "none";
-	$id("audioControlsWrapper").style.display = "";
+	$id("bankingControlsWrapper").classList.add("hide");
+	$id("audioControlsWrapper").classList.remove("hide");
 
-	$id("editorHideWrapper").style.display = "";
-    $id("checkShowWrapper").style.display = "none";
-    $id("loopEditorWrapper").style.overflow = "auto";
+	$id("editorHideWrapper").classList.remove("hide");
+    $id("checkShowWrapper").classList.add("hide");
 
 	//We have to do this to not mess up the drawing
 	resizeCanvasesAndRedrawHistogram()
 };
 
 $id("cashTab").onclick = function() {
-	$id("bankingControlsWrapper").style.display = "";
-	$id("audioControlsWrapper").style.display = "none";
+	$id("bankingControlsWrapper").classList.remove("hide");
+	$id("audioControlsWrapper").classList.add("hide");
 
-	$id("editorHideWrapper").style.display = "none";
-	$id("checkShowWrapper").style.display = "";
-    $id("loopEditorWrapper").style.overflow = "none";
+	$id("editorHideWrapper").classList.add("hide");
+	$id("checkShowWrapper").classList.remove("hide");
 
 	resizeCanvasesAndRedrawHistogram()
 };
@@ -151,7 +149,7 @@ function cash(elevations) {
 	$id("cashAmount").value = amount.toFixed(2);
 }
 
-//Cash go button - modify SVG
+//Cash go button - render SVG
 $id("cashGo").onclick = function() {
 	//Grab the names from the page
 	//And the amount, whether sending or receiving, etc
@@ -177,15 +175,11 @@ $id("cashGo").onclick = function() {
 	let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	let dateString = months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 
-
-
-	let sendBtn = $id("sendMoney");
-
     // Finalize the SVG
     let svgString = checkSVG.svgString.replace("\{svgDollarNText\}", amount);
     svgString = svgString.replace("\{svgDollarWordsText\}", finalAmtString);
     svgString = svgString.replace("\{svgDateText\}", dateString);
-    if(sendBtn.checked) {
+    if($id("sendMoney").checked) {
         svgString = svgString.replace("\{svgSenderText\}", senderName);
         svgString = svgString.replace("\{svgDestinationText\}", toName);
       } else {
@@ -203,26 +197,26 @@ let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
 
 // Map layer canvas
 let mapContainerDOM = $id("mapWrapper");
-canvasDOM = $id("drawingLayer");
+let canvasDOM = $id("drawingLayer");
 let canvasContext = canvasDOM.getContext("2d");
 
 // Update each size and redraw on window resize
 function resizeCanvasesAndRedrawHistogram(resizeEvent){
-    console.log("resizing Canvases to ",  canvasDOM.offsetWidth, ", ", canvasDOM.offsetHeight);
+	// Update map layer canvas size
 	canvasDOM.width = canvasDOM.offsetWidth;
 	canvasDOM.height = canvasDOM.offsetHeight;
 
-	// Code for histogram window resizing
+	// Update histogram canvas size
 	stagedAudioCanvasDOM.width = stagedAudioCanvasDOM.offsetWidth;
 	stagedAudioCanvasDOM.height = stagedAudioCanvasDOM.offsetHeight;
 
-	// Redraw on resize
+	// Redraw histogram on resize (don't redraw map layer since it's temporary, can't resize while drawing)
 	if(pathsAsElevations.length > 0){
 		renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
 	}
 };
 
-// Call it once to initialize the values
+// Call it once to initialize the values and recall it each time the window's resized
 resizeCanvasesAndRedrawHistogram();
 window.onresize = resizeCanvasesAndRedrawHistogram;
 
@@ -418,12 +412,10 @@ function normalizeToMidiNotes(noteMin, noteMax, sampleTo, sampleToPredicate, ele
 	}
 
 	//Next, apply a similar procedure to get midi notes, except this time with rounding bc midi notes are ints
-	let midiNotes = [];
-
 	//We don't need to find min and max, they are 0 and 100 by definition
-	normalizedElevations.forEach(function(x) {
+	let midiNotes = normalizedElevations.map(function(x) {
 		let preRoundNote = ((x/100) * (noteMax - noteMin)) + noteMin;
-		midiNotes.push(Math.round(preRoundNote));
+		return Math.round(preRoundNote);
 	});
 
 	return midiNotes;

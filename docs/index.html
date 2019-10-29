@@ -16,16 +16,16 @@
 		<div id="mapToolbar" class="containerPadded">
 			Select mode:
 			<div class="buttonGroup">
-			    <input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">Panning</label><!--
-			 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">Drawing</label>
+			    <input type="radio" name="mode" id="panningMode" value="panning" autocomplete="off" checked><label for="panningMode" class="radioButton">&#xf256; Panning</label><!--
+			 --><input type="radio" name="mode" id="drawingMode" value="drawing" autocomplete="off"><label for="drawingMode" class="radioButton">&#xf1fc; Drawing</label>
 			</div>
 			&emsp;
-			Load a location:
-			<select name="locationSelect" autocomplete="off">
+			<label for="locationSelect">Load a location:</label>
+			<select id="locationSelect" name="locationSelect" autocomplete="off">
 			</select>
 			&emsp;
-			Bookmark current location:
-			<input type="text" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
+			<label for="saveLocationName">Bookmark current location:</label>
+			<input type="text" id="saveLocationName" name="saveLocationName" autocomplete="off" placeholder="Location Save Name">
 			<input type="button" name="saveLocationButton" value="Save">
 		</div>
 		<div id="mapWrapper">
@@ -106,25 +106,25 @@
 		<div id="editorHideWrapper">
 			<div id="editorToolbarContainer" class="containerPadded">
 				<div class="buttonGroup">
-				    <input type="button" value="▶ Play" id="btn-play"><!-- 
-				 --><input type="button" value="⏸ Pause" id="btn-pause"><!-- 
-				 --><input type="button" value="⏹ Stop" id="btn-stop"><!-- 
-				 --><input type="button" value="🗙 Clear Tracks" id="btn-clear">
+				    <input type="button" value="&#xf04b; Play" id="btn-play"><!-- 
+				 --><input type="button" value="&#xf04c; Pause" id="btn-pause"><!-- 
+				 --><input type="button" value="&#xf04d; Stop" id="btn-stop"><!-- 
+				 --><input type="button" value="&#xf014; Clear Tracks" id="btn-clear">
 				</div>
 
 				<div class="buttonGroup">
-				    <input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">Cursor</label><!--
-				 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">Select</label><!--
-				 --><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">Shift</label>
+				    <input type="radio" name="playlist-controller" id="btn-cursor" autocomplete="off" checked><label class="radioButton" for="btn-cursor">&#xf246; Cursor</label><!--
+				 --><input type="radio" name="playlist-controller" id="btn-select" autocomplete="off"><label class="radioButton" for="btn-select">&#xf25a; Select</label><!--
+				 --><input type="radio" name="playlist-controller" id="btn-shift"  autocomplete="off"><label class="radioButton" for="btn-shift">&#xf0ec; Shift</label>
 				</div>
 
-				<input type="button" value="Trim" id="btn-trim-audio">
+				<input type="button" value="&#xf0c4; Trim" id="btn-trim-audio">
 
 				<input type="button" value="Download" id="btn-download">
 
 				<div class="buttonGroup">
-				    <input type="button" value="Save Project File" id="projSave"><!--
-				 --><input type="button" value="Load Project File" id="projLoad">
+				    <input type="button" value="&#xf019; Save Project File" id="projSave"><!--
+				 --><input type="button" value="&#xf093; Load Project File" id="projLoad">
 				</div>
 				<div id="chooseFileContainer" class="hide">
 					<input type="file" id="filePicker" name="files[]">

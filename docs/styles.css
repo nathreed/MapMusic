@@ -2,7 +2,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-family: sans-serif;
+	font-family: "FontAwesome", sans-serif;
 	font-size: 13px;
 	color: #eeeeee;
 	background-color: #303030;
@@ -61,13 +61,23 @@ input[disabled] {
 	cursor: not-allowed;
 }
 
-/* Style text input */
+/* Style text input and selects */
 input[type="text"], input[type="number"] {
 	background-color: transparent;
 	border: none;
 	color: #eeeeee;
 	border-bottom: 2px solid #eeeeee;
 	-moz-appearance: textfield;
+}
+
+select {
+	background-color: transparent;
+	border: none;
+	color: #eeeeee;
+	border-bottom: 2px solid #eeeeee;
+}
+option {
+	background-color: #3D3D3D;
 }
 
 /* Style numerical input */
@@ -88,13 +98,13 @@ input[type="button"], .buttonGroup .radioButton {
 	border-radius: 500px;
 	color: #eeeeee;
 	font-size: 13px;
+	font-family: "FontAwesome", sans-serif;
 	border: 2px solid #aaaaaa;
 	cursor: pointer;
 }
 
 input[type="button"]:active, .radioButton:active {
 	color: #ffffff;
-	border: 2px solid #ffffff;
 	background-color: #303030;
 }
 
@@ -117,7 +127,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 .buttonGroup input[type="radio"]:checked + .radioButton {
 	background-color: #aaaaaa;
 	color: #3D3D3D;
-	border: 2px solid #aaaaaa;
+	border-color: #aaaaaa;
 }
 
 .buttonGroup input[type="radio"] {
@@ -241,13 +251,15 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 }
 
 .playlist .controls label::after {
-	content: "+";
+	font-family: "FontAwesome";
+	content: "\f028";
 	font-size: 24px;
 	color: #eeeeee;
 }
 
 .playlist .controls label::before {
-	content: "-";
+	font-family: "FontAwesome";
+	content: "\f027";
 	font-size: 24px;
 	color: #eeeeee;
 }

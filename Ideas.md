@@ -21,14 +21,14 @@ So we will take this 0-100 number and map it onto the musical scale between C1 a
 ## Things We Should Add
 - [x] Remove jQuery requirement
 - [x] for the pitch drawing instrument we have now: user-configurable length of play maybe add linear interpolation of elevation data so that we can only sample a few  points from the user's line, helpful for shorter clips
+- [x] Switch to font awesome icons
+- [ ] Restyle dropdowns to match aesthetic
 - [ ] controls pane on right: drop down or tabbed interface to select controls for which instrument/effect and then the controls adapt
 - [ ] Make the histogram map colored
 - [ ] Make mobile work
 	- [ ] Media queries for CSS
 	- [ ] touch events
 - [ ] Load midi fonts/own synth presets
-- [ ] Restyle dropdowns to match aesthetic
-- [ ] Switch to font awesome icons
 - [ ] Reorganize code
 - [ ] Make check downloadable/printable (can't right now since it's embedded directly)
 - [ ] Clean up build commands
