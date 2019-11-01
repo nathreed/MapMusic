@@ -254,15 +254,20 @@ $id("cashGo").onclick = function() {
 	//And the amount, whether sending or receiving, etc
 	let senderName = $id("yourName").value;
 	let toName = $id("cashName").value;
+
+	// If receiving money, swap values
+	if($id("reqMoney").checked) {
+		let temp = senderName;
+		senderName = toName;
+		toName = temp;
+	}
+
+	// Numerical value of $
 	let amount = $id("cashAmount").value;
 
 	//Get spelled out words for the dollar amount
 	let dollars = parseInt(amount);
-	let dollarsString = numConverter.toWords(dollars) + " dollars";
-
-	let centsString = " and " + Math.round((amount-dollars)*100) + "/100";
-
-	let finalAmtString = dollarsString + centsString;
+	let finalAmtString = numConverter.toWords(dollars) + " dollars and " + Math.round((amount - dollars) * 100) + "/100";
 	finalAmtString = finalAmtString.toUpperCase();
 
 	//Format date
@@ -275,18 +280,11 @@ $id("cashGo").onclick = function() {
     let svgString = checkSVG.svgString.replace("\{svgDollarNText\}", amount);
     svgString = svgString.replace("\{svgDollarWordsText\}", finalAmtString);
     svgString = svgString.replace("\{svgDateText\}", dateString);
-    if($id("sendMoney").checked) {
-        svgString = svgString.replace("\{svgSenderText\}", senderName);
-        svgString = svgString.replace("\{svgDestinationText\}", toName);
-      } else {
-		//Requesting money, swap names on check
-        svgString = svgString.replace("\{svgSenderText\}", toName);
-        svgString = svgString.replace("\{svgDestinationText\}", senderName);
-	}
+    svgString = svgString.replace("\{svgSenderText\}", senderName);
+    svgString = svgString.replace("\{svgDestinationText\}", toName);
 
 	// URL encoding the SVG so can right click to download it
-	let urlEncodedSvg = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svgString);
-    $id("checkShowWrapper").innerHTML = document.createElement("img", {src: urlEncodedSvg, alt:"Print and cash this check to complete the transfer."});
+    $id("checkImage").src = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svgString);
 };
 
 // Audio config preview canvas
