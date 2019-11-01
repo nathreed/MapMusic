@@ -60,7 +60,7 @@ input, select {
 	margin: 3px 0px;
 }
 
-input[disabled] {
+input[disabled], input[disabled] + .radioButton {
 	cursor: not-allowed;
 }
 

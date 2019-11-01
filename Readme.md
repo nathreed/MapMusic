@@ -25,14 +25,14 @@ Revision submitted for DandyHacks was 813061a036fcadbd966b5d975bc7982478afc30f
 - [x] for the pitch drawing instrument we have now: user-configurable length of play maybe add linear interpolation of elevation data so that we can only sample a few points from the user's line, helpful for shorter clips
 - [x] Switch to font awesome icons
 - [x] Restyle dropdowns to match aesthetic
+- [x] Make check downloadable/printable (can't right now since it's embedded directly)
+- [x] Make mobile work
+	- [x] Media queries for CSS
+	- [x] touch events
 - [ ] controls pane on right: drop down or tabbed interface to select controls for which instrument/effect and then the controls adapt
 - [ ] Make the histogram map colored
 - [ ] Make the histogram show the generated notes
 - [ ] Resizeable areas
-- [ ] Make check downloadable/printable (can't right now since it's embedded directly)
-- [x] Make mobile work
-	- [x] Media queries for CSS
-	- [x] touch events
 - [ ] Load midi fonts/own synth presets
 - [ ] Reorganize code
 	- [x] Paths as objects
