@@ -579,11 +579,14 @@ document.addEventListener("keydown", function(e) {
 });
 
 function setupMIDIDownload() {
+	if(!stagedPath) {
+		return; //do nothing if there is not a staged path
+	}
 	//Have to get the note duration
 	//Easiest way to do this is with the config values
 	let configValues = getAudioConfigValues();
 	//let elevations = pathObj.elevations;
-	let notes = pathObj.normalizeToMidiTones(configValues);
+	let notes = stagedPath.normalizeToMidiTones(configValues);
 	//If noteDuration is set, we can just use that, else we need to determine it
 	let durationSec = 0;
 	if(configValues.noteDuration) {
