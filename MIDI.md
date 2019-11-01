@@ -2,6 +2,12 @@
 
 These are my notes taken while reading https://www.csie.ntu.edu.tw/~r92092/ref/midi/
 
+CURRENT STATE: the MIDI export code in `midi-export.js` outputs playable MIDI files. I have tested them with GarageBand
+and Timidity. It appears to be somewhat buggy, as the files import oddly into GarageBand but play fine in Timidity. Also,
+tempo information doesn't appear to be working properly.
+
+Press hotkey M to download midi of the current staged audio.
+
 
 ## File format basics
 made of chunks
@@ -31,7 +37,12 @@ Format 2 allows multiple tracks to be played at once, maybe useful for later if 
 tracks - 16bit/2bytes. Number of track chunks in the file.
 
 division - 16bit/2bytes. Default unit of delta-time. If MSBit is 0, it's "ticks per quarter note"
-and if 1, it's "frames per second" followed by "ticks per frame"
+and if 1, it's "frames per second" followed by "ticks per frame".
+
+We will be using the ticks per quarter note method, and I'm pretty sure we can just specify
+any number for that, so let's just pick 48 to go with the MIDI default.
+
+So our division will look like `00 30` (mode 0 for ticks/qn and then 48 ticks/qn)
 
 ### Formats
 
@@ -41,6 +52,9 @@ Track chunk contains all note and tempo info
 For later - format 2 is one header chunk and one or more track chunks where each is an independent sequence
 
 Actually we might as well write format 2 files and just start with one track
+
+But for right now since I can't find a good example of format 2 files, we are writing format 0 (just one track)
+because that's all I can get to load properly in MIDI sequencers/GarageBand
 
 ### Track Chunks
 
@@ -85,6 +99,23 @@ Important ones:
 
 #### Full File Example
 
-Header: `MThd | 00 00 00 06 | 00 02 | 00 01 | <division tbd>`
+Header: `MThd | 00 00 00 06 | 00 00 | 00 01 | 01 80` (format 0, 1 track, 384 ticks/beat)
 
-Track 1: `MTrk | ll ll ll ll | `
+Track 1: `MTrk | 00 00 00 27 | 00 FF 03 08 MapMusic | 00 FF 51 03 07 A1 20 | 00 FF 58 04 04 02  |  00 90 3c 40 | (83 00 | 80 3c 40) | 00 FF 2F 00`
+(length = 0x27 bytes (39), set track title to MapMusic, set tempo to 120bpm (500k us/beat), set time signature to 4/4, note on C4 at delta-t 0, note off C4 at delta-t 384 ticks (variable rep 0x8300) )
+in that order
+
+Text is obviously written as its bytes, the ASCII is just written here as shorthand.
+#### Converting Our Data to MIDI
+
+The UI selections will govern how long one note is. We are just going to assume everything is a quarter note in the MIDI
+and set the tempo accordingly to achieve the desired playback speed. This way,
+the tempo can be easily changed in a MIDI sequencer later. 
+
+With this in mind, we will use the length of one note (as determined by the UI settings)
+to determine a BPM value. This will be used in the set-tempo event that gets written
+to the beginning of each track. 
+
+Since all notes will be quarter notes and we are using 384 ticks/qn, every note will 
+go into the midi with a note on event at an offset and a note off event 384 ticks later. The 
+next note-on event will occur at delta-t 0 after the 

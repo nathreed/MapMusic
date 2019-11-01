@@ -1,6 +1,8 @@
 const Tone = require("tone");
 //const toWav = require("audiobuffer-to-wav");
 const toWav = require("./wav-export").wavFromBuffer;
+const toMIDI = require("./midi-export").exportMIDI;
+
 //NOTE: Tone.js should be included in the HTML before this file
 function midi(note) {
     return new Tone.Frequency(note, "midi");
@@ -87,5 +89,6 @@ function renderOffline(midiNotes, config, callback) {
 
 module.exports = {
     playTones: playTones,
-    renderOffline: renderOffline
+    renderOffline: renderOffline,
+    toMIDI: toMIDI
 };

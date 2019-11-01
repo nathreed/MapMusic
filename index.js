@@ -571,8 +571,29 @@ document.addEventListener("keydown", function(e) {
 			// T: trip selection in playlist
 			ee.emit("trim");
 			break;
+		case "m":
+			//M: download midi file
+			setupMIDIDownload();
+			break;
 	}
 });
+
+function setupMIDIDownload() {
+	//Have to get the note duration
+	//Easiest way to do this is with the config values
+	let configValues = getAudioConfigValues();
+	//let elevations = pathObj.elevations;
+	let notes = pathObj.normalizeToMidiTones(configValues);
+	//If noteDuration is set, we can just use that, else we need to determine it
+	let durationSec = 0;
+	if(configValues.noteDuration) {
+		durationSec = configValues.noteDuration;
+	} else {
+		durationSec = configValues.totalPlayTime / notes.length;
+	}
+
+	Music.toMIDI(notes, durationSec, configValues.soundName);
+}
 
 
 /*
