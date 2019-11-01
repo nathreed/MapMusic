@@ -99,12 +99,19 @@ $id("musicTab").onclick = function() {
 };
 
 $id("cashTab").onclick = function() {
+	// Toggle what's being shown
 	$id("bankingControlsWrapper").classList.remove("hide");
 	$id("audioControlsWrapper").classList.add("hide");
 
 	$id("editorHideWrapper").classList.add("hide");
 	$id("checkShowWrapper").classList.remove("hide");
 
+	// Call the cash function to update the input values
+	if(stagedPath){
+		cash(stagedPath.coordinates[0].alt, stagedPath.coordinates[stagedPath.coordinates.length - 1].alt);
+	}
+
+	// Update the canvas because we always update the canvas
 	resizeCanvasesAndRedrawHistogram()
 };
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
@@ -118,16 +125,15 @@ function elevationDataDispatch(pathObj) {
 		}
 	} else {
 		//Cash tab is selected, dispatch to cash code
-		cash(pathObj.elevations);
+		cash(pathObj.coordinates[0].alt, pathObj.coordinates[pathObj.coordinates.length - 1].alt);
 	}
 }
 
 
-function cash(elevations) {
+function cash(start, end) {
 	//First determine if we are sending or requesting money
-	//If the general trend is downhill, we are sending
-	//If the general trend is uphill, we are requesting
-	if(elevations[0] >= elevations[elevations.length - 1]) {
+	//If the general trend is downhill, we are sending, otherwise requesting
+	if(start >= end) {
 		//First is greater than the last, that means downhill -> sending
 		$id("sendMoney").checked = true;
 	} else {
@@ -136,7 +142,7 @@ function cash(elevations) {
 	}
 
 	//Next determine the amount, this is the abs of the first minus last
-	let amount = Math.abs(elevations[0] - elevations[elevations.length - 1]);
+	let amount = Math.abs(start - end);
 	$id("cashAmount").value = amount.toFixed(2);
 }
 
@@ -147,9 +153,6 @@ $id("cashGo").onclick = function() {
 	let senderName = $id("yourName").value;
 	let toName = $id("cashName").value;
 	let amount = $id("cashAmount").value;
-
-	//Check to see if it's filled in
-	//if(amount === "") return;
 
 	//Get spelled out words for the dollar amount
 	let dollars = parseInt(amount);
@@ -179,11 +182,13 @@ $id("cashGo").onclick = function() {
         svgString = svgString.replace("\{svgDestinationText\}", senderName);
 	}
 
-    $id("checkShowWrapper").innerHTML = svgString;
+	// URL encoding the SVG so can right click to download it
+	let urlEncodedSvg = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svgString);
+    $id("checkShowWrapper").innerHTML = document.createElement("img", {src: urlEncodedSvg, alt:"Print and cash this check to complete the transfer."});
 };
 
 // Audio config preview canvas
-let audioHistogramCanvas = $id("audioHistogramCanvas");
+let elevationHistogramCanvas = $id("elevationHistogramCanvas");
 
 // Map layer canvas
 let mapCanvasDOM = $id("drawingLayer");
@@ -196,12 +201,12 @@ function resizeCanvasesAndRedrawHistogram(){
 	mapCanvasDOM.height = mapCanvasDOM.offsetHeight;
 
 	// Update histogram canvas size
-	audioHistogramCanvas.width = audioHistogramCanvas.offsetWidth;
-	audioHistogramCanvas.height = audioHistogramCanvas.offsetHeight;
+	elevationHistogramCanvas.width = elevationHistogramCanvas.offsetWidth;
+	elevationHistogramCanvas.height = elevationHistogramCanvas.offsetHeight;
 
 	// Redraw histogram on resize (don't redraw map layer since it's temporary, can't resize while drawing)
 	if(stagedPath){
-		stagedPath.renderHistogram(audioHistogramCanvas, true);
+		stagedPath.renderHistogram(elevationHistogramCanvas, true);
 	}
 };
 
@@ -349,7 +354,7 @@ mapCanvasDOM.onmouseup = mapCanvasDOM.ontouchend = function(e) {
 
 		// Make a new path object and graph it, add it to the map
 		stagedPath = new Path(coordinates);
-		stagedPath.renderHistogram(audioHistogramCanvas, true);
+		stagedPath.renderHistogram(elevationHistogramCanvas, true);
 		stagedPath.addTo(mymap);
 		elevationDataDispatch(stagedPath);
 	}

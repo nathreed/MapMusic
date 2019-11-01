@@ -179,15 +179,15 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	z-index: 1;
 }
 
-/* Audio controls stuff */
-#audioControlsContainer {
+/* Side controls stuff */
+#sideControlsContainer {
 	grid-area: audioControls;
 	background-color: #3D3D3D;
 	min-width: 270px;
 	position: relative;
 }
 
-#audioHistogramCanvas {
+#elevationHistogramCanvas {
 	width: 100%;
 	height: 10vh;
 }
