@@ -4,6 +4,7 @@ const Music = require("./music-gen");
 const WaveformPlaylist = require('waveform-playlist');
 const numConverter = require("number-to-words");
 const checkSVG = require("./fakeCheckSVG.js");
+const Path = require("./Path").Path;
 //the styles for waveform-playlist are included separately and compiled in a separate step
 
 // Map toolbar handling
@@ -12,12 +13,12 @@ let mapToolbarChildren = $id("mapToolbar").children;
 $id("panningMode").oninput = function(e){
 	// Set to panning mode by removing click events on the canvas
 	console.log("setting pan mode");
-	canvasDOM.classList.add("noInteraction");
+	mapCanvasDOM.classList.add("noInteraction");
 };
 
 $id("drawingMode").oninput = function(e){
 	console.log("setting drawmode");
-	canvasDOM.classList.remove("noInteraction");
+	mapCanvasDOM.classList.remove("noInteraction");
 };
 
 // Add a place to the saved locations list in display and data
@@ -75,6 +76,7 @@ let terrainVisible = L.tileLayer(urlTerrain, {
 	accessToken: accessToken
 }).addTo(mymap);
 
+// Elevation data, hidden from view
 let elevationData = L.tileLayer.colorPicker(urlRGBheight, {
 	attribution: "",
 	minZoom: 1,
@@ -83,13 +85,6 @@ let elevationData = L.tileLayer.colorPicker(urlRGBheight, {
 	opacity: 0.0,
 	accessToken: accessToken
 }).addTo(mymap);
-
-
-//mymap.dragging.disable(); //disable drag for now
-
-// Data for the paths
-pathsAsPolylines = [];
-pathsAsElevations = [];
 
 //Switch between music tab and cash tab
 $id("musicTab").onclick = function() {
@@ -114,23 +109,19 @@ $id("cashTab").onclick = function() {
 };
 //Given the last set of elevations, determine whether to send them to the music playing code or the bank code
 //This will be determined based on which tab is selected on top
-function elevationDataDispatch(elevations) {
+function elevationDataDispatch(pathObj) {
 	if($id("musicTab").checked) {
 		//Music tab is selected, dispatch to music code (if setting to play automatically)
-		if(getAudioConfigValues().playLivePreview) {
-			playMusic(elevations);
+		let audioConfig = getAudioConfigValues();
+		if(audioConfig.playLivePreview) {
+			pathObj.playAudio(audioConfig);
 		}
 	} else {
 		//Cash tab is selected, dispatch to cash code
-		cash(elevations);
+		cash(pathObj.elevations);
 	}
 }
 
-function playMusic(elevations) {
-	//Get the config values from the page
-	let configValues = getAudioConfigValues();
-	Music.playTones(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues);
-}
 
 function cash(elevations) {
 	//First determine if we are sending or requesting money
@@ -192,29 +183,30 @@ $id("cashGo").onclick = function() {
 };
 
 // Audio config preview canvas
-let stagedAudioCanvasDOM = $id("stagedAudioCanvas");
-let stagedAudioCanvasContext = stagedAudioCanvasDOM.getContext("2d");
+let audioHistogramCanvas = $id("audioHistogramCanvas");
 
 // Map layer canvas
-let mapContainerDOM = $id("mapWrapper");
-let canvasDOM = $id("drawingLayer");
-let canvasContext = canvasDOM.getContext("2d");
+let mapCanvasDOM = $id("drawingLayer");
+let mapCanvasContext = mapCanvasDOM.getContext("2d");
 
 // Update each size and redraw on window resize
-function resizeCanvasesAndRedrawHistogram(resizeEvent){
+function resizeCanvasesAndRedrawHistogram(){
 	// Update map layer canvas size
-	canvasDOM.width = canvasDOM.offsetWidth;
-	canvasDOM.height = canvasDOM.offsetHeight;
+	mapCanvasDOM.width = mapCanvasDOM.offsetWidth;
+	mapCanvasDOM.height = mapCanvasDOM.offsetHeight;
 
 	// Update histogram canvas size
-	stagedAudioCanvasDOM.width = stagedAudioCanvasDOM.offsetWidth;
-	stagedAudioCanvasDOM.height = stagedAudioCanvasDOM.offsetHeight;
+	audioHistogramCanvas.width = audioHistogramCanvas.offsetWidth;
+	audioHistogramCanvas.height = audioHistogramCanvas.offsetHeight;
 
 	// Redraw histogram on resize (don't redraw map layer since it's temporary, can't resize while drawing)
-	if(pathsAsElevations.length > 0){
-		renderElevationHistogram(pathsAsElevations[pathsAsElevations.length-1]);
+	if(stagedPath){
+		stagedPath.renderHistogram(audioHistogramCanvas, true);
 	}
 };
+
+let pathsList = [];
+let stagedPath = null;
 
 // Call it once to initialize the values and recall it each time the window's resized
 resizeCanvasesAndRedrawHistogram();
@@ -222,7 +214,6 @@ window.onresize = resizeCanvasesAndRedrawHistogram;
 
 // Drawing code
 const draftingLineColor = "#525442";
-const setLineColor = "#464738";
 let painting = false;
 let lineCoordinates = [];
 const rawDistanceThreshold = 2;
@@ -291,135 +282,110 @@ $id("sampleToPredicate").onclick = function(e){
 	}
 }
 
-canvasDOM.onmousedown = function(e) {
+// Starting drawing
+mapCanvasDOM.onmousedown = function(e) {
+	// Set painting variables
 	painting = true;
-    const mouseLocation = L.point(e.offsetX, e.offsetY);
+    let mouseLocation = L.point(e.offsetX, e.offsetY);
 
-	lineCoordinates.push(mouseLocation);
+    // Clear the old path
+    if(stagedPath && !pathsList.includes(stagedPath)){
+    	stagedPath.removeFrom(mymap);
+    }
 
 	// Start drawing a line
-	canvasContext.strokeStyle = draftingLineColor;
-	canvasContext.lineJoin = "round";
-	canvasContext.lineCap = "round";
-	canvasContext.lineWidth = 1;
-	canvasContext.beginPath();
-	canvasContext.moveTo(mouseLocation.x, mouseLocation.y);
+	lineCoordinates.push(mouseLocation);
+	mapCanvasContext.strokeStyle = draftingLineColor;
+	mapCanvasContext.lineJoin = "round";
+	mapCanvasContext.lineCap = "round";
+	mapCanvasContext.lineWidth = 1;
+	mapCanvasContext.beginPath();
+	mapCanvasContext.moveTo(mouseLocation.x, mouseLocation.y);
 };
 
-canvasDOM.onmousemove = function(e) {
+mapCanvasDOM.onmousemove = function(e) {
 	if(painting) {
-        const mouseLocation = L.point(e.offsetX, e.offsetY);
+        let mouseLocation = L.point(e.offsetX, e.offsetY);
 
 		// Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
-		const v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
-		const du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(rawDistanceThreshold);
+		let v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
+		let du = v.divideBy(v.distanceTo(L.point(0,0))).multiplyBy(rawDistanceThreshold);
 
 		// If greater than the distance criteria, draw set length lines towards current mouse location until too close
 		while(mouseLocation.distanceTo(lineCoordinates[lineCoordinates.length - 1]) >= rawDistanceThreshold){
 			// Interpolate a point rawDistanceThreshold units away from the last point (final bit of: https://math.stackexchange.com/a/175906)
-			const interpolatedPoint = du.add(lineCoordinates[lineCoordinates.length - 1]);
+			let interpolatedPoint = du.add(lineCoordinates[lineCoordinates.length - 1]);
 
 			// Add the interpolated point to the list
 			lineCoordinates.push(interpolatedPoint);
 
 			// Draw the next line segment
-			canvasContext.lineTo(interpolatedPoint.x, interpolatedPoint.y);
-			canvasContext.stroke();
+			mapCanvasContext.lineTo(interpolatedPoint.x, interpolatedPoint.y);
+			mapCanvasContext.stroke();
 		}
 	}
 };
 
-canvasDOM.onmouseup = function(e) {
+mapCanvasDOM.onmouseup = function(e) {
 	// Check if there are enough points to do audio stuff
 	if(lineCoordinates.length >= 2) {
-		// Convert to a GeoJSON object (Assumes canvas origin and map origin are equivalent)
-		const coordinates = lineCoordinates.map((point) => {
-			return mymap.containerPointToLatLng(point);
-		});
+		// Set up the new path
+		let coordinates = lineCoordinates.map((point) => {
+			// Get lat and long
+			let coords = mymap.containerPointToLatLng(point);
 
-		// Points to elevation data
-		const elevations = coordinates.map((point) => {
-			const color = elevationData.getColor(point);
+			// Get altitude
+			let color = elevationData.getColor(coords);
 			if (color !== null) {
 				// Convert the RGB channels to one hex number then scale to mapbox elevation data
-				return -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
+				coords.alt = -10000 + 0.1 * ((color[0] << 16) + (color[1] << 8) + color[2]);
 			} else {
 				console.log("crap, coordinates at " + point + " aren't color-elevation-readable.");
 			}
+
+			// return the coordinates
+			return coords;
 		});
 
-		// Add elevation data and path to arrays
-		pathsAsElevations.push(elevations);
-		pathsAsPolylines.push(L.polyline(coordinates, {color: setLineColor}).addTo(mymap));
-
-		elevationDataDispatch(elevations);
-
-		renderElevationHistogram(elevations);
+		// Make a new path object and graph it, add it to the map
+		stagedPath = new Path(coordinates);
+		stagedPath.renderHistogram(audioHistogramCanvas, true);
+		stagedPath.addTo(mymap);
+		elevationDataDispatch(stagedPath);
 	}
 
 	// Reset canvas painting stuff
-	canvasContext.closePath();
-	canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height); // Clears the canvas
+	mapCanvasContext.closePath();
+	mapCanvasContext.clearRect(0, 0, mapCanvasContext.canvas.width, mapCanvasContext.canvas.height); // Clears the canvas
 	painting = false;
 	lineCoordinates = [];
 };
 
-// Render canvas with the height histogram
-function renderElevationHistogram(elevations){
-	// Plot the elevation map
-	let histogramValues = interpolateArray(elevations, Math.floor(stagedAudioCanvasDOM.width));
-	const maxHeight =  Math.max( ...histogramValues);
-	const minHeight =  Math.min( ...histogramValues);
-	stagedAudioCanvasContext.clearRect(0, 0, stagedAudioCanvasDOM.width, stagedAudioCanvasDOM.height);
-	histogramValues.forEach((height, index) => {
-		let normalizedHeight = (height - minHeight)/(maxHeight - minHeight);
-		stagedAudioCanvasContext.fillStyle = "#fff";
-		stagedAudioCanvasContext.fillRect(index, stagedAudioCanvasDOM.height * (1 - normalizedHeight), 1, stagedAudioCanvasDOM.height * normalizedHeight);
-	});
-}
-
 // Audio config options pane submit action
 $id("addStagedAudio").onclick = function(e) {
-	let elevations = pathsAsElevations[pathsAsElevations.length - 1];
-	let configValues = getAudioConfigValues();
-	Music.renderOffline(normalizeToMidiNotes(configValues.lowNote, configValues.highNote, configValues.sampleTo, configValues.sampleToPredicate, elevations), configValues, function (blob) {
-		console.log("blob callback, blob:", blob);
-		playlist.load([{
-			src: blob,
-			name: configValues.soundName,
-			gain: 0.5
-		}]);
-	});
+	// Only add if there's a path to use
+	if(stagedPath){
+		// Adding to the pathsList (saving)
+		pathsList.push(stagedPath);
+
+		let configValues = getAudioConfigValues();
+		Music.renderOffline(stagedPath.normalizeToMidiTones(configValues), configValues, function (blob) {
+			console.log("blob callback, blob:", blob);
+			playlist.load([{
+				src: blob,
+				name: configValues.soundName,
+				gain: 0.5
+			}]);
+		});
+	}
 };
 
 // Audio config options pane play audio again action
 $id("playStagedAudio").onclick = function(e) {
-	playMusic(pathsAsElevations[pathsAsElevations.length - 1])
-};
-
-function normalizeToMidiNotes(noteMin, noteMax, sampleTo, sampleToPredicate, elevations) {
-	//First normalize the elevations to the 100 scale
-	const max = Math.max( ...elevations);
-	const min = Math.min( ...elevations);
-
-	let normalizedElevations = elevations.map((height) => {
-		return ((height - min)/(max - min)) * 100;
-	});
-
-	// If the user wants to resample the notes, do so
-	if(sampleToPredicate){
-		normalizedElevations = interpolateArray(normalizedElevations, sampleTo);
+	if(stagedPath){
+		stagedPath.playAudio(getAudioConfigValues());
 	}
-
-	//Next, apply a similar procedure to get midi notes, except this time with rounding bc midi notes are ints
-	//We don't need to find min and max, they are 0 and 100 by definition
-	let midiNotes = normalizedElevations.map(function(x) {
-		let preRoundNote = ((x/100) * (noteMax - noteMin)) + noteMin;
-		return Math.round(preRoundNote);
-	});
-
-	return midiNotes;
-}
+};
 
 //Setup editor
 let playlist = WaveformPlaylist.init({
@@ -441,7 +407,6 @@ let playlist = WaveformPlaylist.init({
 });
 
 playlist.initExporter();
-console.log("added playlist");
 
 
 /*
@@ -485,6 +450,9 @@ $id("btn-stop").onclick =  function(e) {
 $id("btn-clear").onclick = function(e) {
 	isLooping = false;
 	ee.emit("clear");
+
+	// Clear the map as well
+	clearMapPaths();
 };
 
 //Drag and Drop support
@@ -544,31 +512,6 @@ ee.on('audiorenderingfinished', function (type, data) {
 	}
 });
 
-// Linear interpolation function for remapping elevation data (source: https://stackoverflow.com/a/26941169/3196151)
-function interpolateArray(data, newLength) {
-	const indexScalar = (data.length - 1) / (newLength - 1);
-	let resultData = [];
-
-	// Set the first value to be the same
-	resultData[0] = data[0];
-
-	// For each new index
-	for (let i = 1; i < newLength - 1; i++) {
-		// Figure out how far through the original data it is (and which two datapoints are on either side of it)
-		let howFar = i * indexScalar;
-		let beforeIndex = Math.floor(howFar);
-		let afterIndex = Math.ceil(howFar);
-
-		// Save the value interpolated that far in ()
-		resultData[i] = ((before, after, atPoint) => {return before + (after - before) * atPoint;})(data[beforeIndex], data[afterIndex], howFar - beforeIndex);
-	}
-
-	// Set the last value to be the same
-	resultData[newLength - 1] = data[data.length - 1];
-
-	return resultData;
-}
-
 //Event listeners for keyboard controls
 document.addEventListener("keydown", function(e) {
 	if(document.activeElement.tagName.toLowerCase() === "input") {
@@ -588,12 +531,12 @@ document.addEventListener("keydown", function(e) {
 		case "p":
 			// P: map panning mode
 			// Set to panning mode by removing click events on the canvas
-			canvasDOM.classList.add("noInteraction");
+			mapCanvasDOM.classList.add("noInteraction");
 			$id("panningMode").checked = true;
 			break;
 		case "d":
 			// D: map drawing mode
-			canvasDOM.classList.remove("noInteraction");
+			mapCanvasDOM.classList.remove("noInteraction");
 			$id("drawingMode").checked = true;
 			break;
 		case "s":
@@ -605,6 +548,9 @@ document.addEventListener("keydown", function(e) {
 			// X: clear playlist tracks
 			isLooping = false;
 			ee.emit("clear");
+
+			// Clear the map as well
+			clearMapPaths();
 			break;
 		case "c":
 			// C: cursor playlist tool
@@ -634,14 +580,6 @@ PROJECT FILE SAVE/LOAD
  */
 $id("projSave").onclick = function(e) {
 	//Assemble the components for the file
-	//paths object
-
-	let plGJSON = pathsAsPolylines.map(x => x.toGeoJSON(8));
-	const paths = {
-		elevations: pathsAsElevations,
-		polylines: plGJSON
-	};
-
 	const mapCenter = mymap.getCenter();
 	const mapZoom = mymap.getZoom();
 
@@ -673,13 +611,18 @@ $id("projSave").onclick = function(e) {
 		}));
 	});
 
+	// Extract just the coordinates from the pathsList
+	let coordinates = pathsList.map((path) => {
+		return path.coordinates;
+	});
+
 	Promise.all(trackPromises).then(function() {
 		console.log("ALL TRACKS DONE!");
 		console.log(tracks);
 		//Final object
 		let save = {
 			filetype: "mapmusic-save",
-			paths: paths,
+			pathsCoords: coordinates,
 			tracks: tracks,
 			mapCenter: mapCenter,
 			mapZoom: mapZoom,
@@ -715,14 +658,21 @@ $id("filePicker").onchange = function(e) {
 				throw new Error("wrong filetype");
 			}
 			//Unpack the project data into its various components
-			//First set up the easy stuff
-			let mapCenter = projData.mapCenter;
-			let mapZoom = projData.mapZoom;
-			let fileSavedPlaces = projData.savedPlaces;
+			// Set the zoom and view
+			mymap.setView(projData.mapCenter, projData.mapZoom);
+			
+			// Load the saved places in, clearing the dropdown before we add everything back
+			savedPlaces = projData.savedPlaces;
+			mapToolbarChildren.locationSelect.innerHTML = "";
+			savedPlaces.forEach(addPlaceToPresetsDOM);
 
-			//Extract the polylines and convert back to leaflet obj, and the other path info
-			let leafletPolylines = projData.paths.polylines.map(x => L.geoJSON(x));
-			let filePathsAsElevations = projData.paths.elevations;
+			// Load the paths in (clearing the current paths first) and adding to the map
+			clearMapPaths();
+			pathsList = projData.pathsCoords.map((coordinates) => {
+				let path = new Path(coordinates);
+				path.addTo(mymap);
+				return path;
+			});
 
 			//Extract the tracks
 			let trackData = [];
@@ -752,31 +702,9 @@ $id("filePicker").onchange = function(e) {
 			//Now we have everything back how it should be. Load it all back in
 			//Clear the playlist first.
 			playlist.clear();
+
 			//Load tracks into playlist
 			playlist.load(trackData);
-			//Load paths in
-			this.pathsAsElevations = filePathsAsElevations;
-			//Clear the leaflet map
-			mymap.eachLayer(function (layer) {
-				if(layer === elevationData || layer === terrainVisible) {
-					return;
-				}
-				mymap.removeLayer(layer);
-			});
-			//And add the polylines back
-			leafletPolylines.forEach(function(p) {
-				p.addTo(mymap);
-			});
-			//Load the saved places in
-			//Clear the dropdown before we add everything back
-			mapToolbarChildren.locationSelect.innerHTML = "";
-			this.savedPlaces = fileSavedPlaces;
-			this.savedPlaces.forEach(addPlaceToPresetsDOM);
-			//Set the map center and zoom
-			mymap.center = mapCenter;
-			mymap.zoom = mapZoom;
-
-
 		} catch (e) {
 			console.log("NOT A MAP MUSIC PROJECT SAVE!");
 			console.log(e);
@@ -788,6 +716,20 @@ $id("filePicker").onchange = function(e) {
 	}
 }
 
+// Clear paths from the map
+function clearMapPaths() {
+	// Clear the staged path
+	if(stagedPath){
+		stagedPath.removeFrom(mymap);
+		stagedPath = null;
+	}
+
+	// Clear the saved paths
+	for(let i = 0; i < pathsList.length; i++){
+		pathsList[i].removeFrom(mymap);
+	}
+	pathsList = [];
+}
 
 // JankQuery (We repeat this so much it's painful)
 function $id(id) {
