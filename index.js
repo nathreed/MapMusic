@@ -282,8 +282,8 @@ $id("sampleToPredicate").onclick = function(e){
 	}
 }
 
-// Starting drawing
-mapCanvasDOM.onmousedown = function(e) {
+// Starting drawing (mirrored for touch)
+mapCanvasDOM.onmousedown = mapCanvasDOM.ontouchstart = function(e) {
 	// Set painting variables
 	painting = true;
     let mouseLocation = L.point(e.offsetX, e.offsetY);
@@ -303,7 +303,7 @@ mapCanvasDOM.onmousedown = function(e) {
 	mapCanvasContext.moveTo(mouseLocation.x, mouseLocation.y);
 };
 
-mapCanvasDOM.onmousemove = function(e) {
+mapCanvasDOM.onmousemove = mapCanvasDOM.ontouchmove = function(e) {
 	if(painting) {
         let mouseLocation = L.point(e.offsetX, e.offsetY);
 
@@ -326,7 +326,7 @@ mapCanvasDOM.onmousemove = function(e) {
 	}
 };
 
-mapCanvasDOM.onmouseup = function(e) {
+mapCanvasDOM.onmouseup = mapCanvasDOM.ontouchend = function(e) {
 	// Check if there are enough points to do audio stuff
 	if(lineCoordinates.length >= 2) {
 		// Set up the new path

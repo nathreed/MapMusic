@@ -30,9 +30,9 @@ Revision submitted for DandyHacks was 813061a036fcadbd966b5d975bc7982478afc30f
 - [ ] Make the histogram show the generated notes
 - [ ] Resizeable areas
 - [ ] Make check downloadable/printable (can't right now since it's embedded directly)
-- [ ] Make mobile work
-	- [ ] Media queries for CSS
-	- [ ] touch events
+- [x] Make mobile work
+	- [x] Media queries for CSS
+	- [x] touch events
 - [ ] Load midi fonts/own synth presets
 - [ ] Reorganize code
 	- [x] Paths as objects
