@@ -7,6 +7,8 @@ Elevation info will be normalized on a per-line basis, let's say in the range of
 So we will take this 0-100 number and map it onto the musical scale between C1 and C6
 (midi 24-84). 
 
+Revision submitted for DandyHacks was 813061a036fcadbd966b5d975bc7982478afc30f
+
 ## Tools/Effects
 - pitch: elevation maps to pitch and generates music (see above)
 - volume: elevation maps to volume levels (easy mapping 0-100%) and modifies existing track
