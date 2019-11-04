@@ -954,6 +954,50 @@ function decimalToHexString(number)
 	return number.toString(16).toUpperCase();
 }
 
+function DataViewWrapper(fileSize) {
+	this.buffer = new ArrayBuffer(fileSize);
+	this.view = new DataView(this.buffer);
+
+
+	//Keep track of the offset we are writing to inside the dataView
+	this.offset = 0;
+
+	this.init = function() {
+		this.offset = 0;
+		this.buffer = new ArrayBuffer(fileSize);
+		this.view = new DataView(this.buffer);
+		return this; //for convenience use as part of object construction
+	};
+
+	//Functions for writing common types to the dataview
+	this.writeUint8 = function(val) {
+		this.view.setUint8(this.offset, val);
+		this.offset += 1;
+	};
+
+	this.writeUint16 = function(val) {
+		this.view.setUint16(this.offset, val);
+		this.offset += 2;
+	};
+
+	this.writeUint32 = function(val) {
+		this.view.setUint32(this.offset, val);
+		this.offset += 4;
+	};
+
+	this.writeString = function(string) {
+		for (let i = 0; i < string.length; i += 1) {
+			this.view.setUint8(this.offset + i, string.charCodeAt(i));
+		}
+		this.offset += string.length;
+	};
+
+	this.blob = function(type) {
+		return new Blob([this.buffer], {type: type});
+	};
+
+}
+
 //Borrowed from the wav-export code
 function writeString(view, offset, string) {
 	for (let i = 0; i < string.length; i += 1) {
@@ -969,7 +1013,7 @@ function writeMIDI(notes, noteLength, trackName) {
 	console.log("Tempo BPM:", tempoBPMDec);
 
 	//Obtain the midi blob and cause a file download
-	const midi = encodeMIDI(notes, tempoBPMDec, trackName);
+	const midi = encodeMIDIFormat1(notes, tempoBPMDec, trackName);
 
 	let anchor = document.createElement('a');
 	document.body.appendChild(anchor);
@@ -982,12 +1026,16 @@ function writeMIDI(notes, noteLength, trackName) {
 
 }
 
-function encodeMIDI(notes, tempoBPMDec, trackName) {
+function encodeMIDIFormat0(notes, tempoBPMDec, trackName) {
 	//The number of bytes we need for the ArrayBuffer is calculated as follows
 	//14 bytes for the header chunk
 	//25 bytes for the beginning of the track setup (time signature, tempo, etc) plus length of the track name
 	//For every note, we need an on command (4 bytes) and an off command (5 bytes), so 9 bytes/note
 	//4 bytes for the end track event
+	//truncate track name length if necessary
+	if(trackName.length > 127) {
+		trackName = trackName.substring(0, 128);
+	}
 	const arrLength = 14 + 25 + trackName.length + (notes.length * 9) + 4;
 	let buffer = new ArrayBuffer(arrLength);
 	//Create a DataView to write into the buffer
@@ -1013,7 +1061,7 @@ function encodeMIDI(notes, tempoBPMDec, trackName) {
 	const mtrkChunkLen = 17 + trackName.length + 9*notes.length;
 	view.setUint32(18, mtrkChunkLen, false);
 	//Write track name event, delta-t = 0
-	view.setUint32(22, 0x00ff0308, false);
+	view.setUint32(22, 0x00ff0300 + trackName.length, false);
 	//Write the name itself
 	writeString(view, 26, trackName);
 	const newOffset = 26 + trackName.length;
@@ -1059,6 +1107,94 @@ function encodeMIDI(notes, tempoBPMDec, trackName) {
 
 	//Return a new blob with the ArrayBuffer
 	return new Blob([buffer], {type: "audio/midi"});
+}
+
+function encodeMIDIFormat1(notes, tempoBPMDec, trackName) {
+	//First calculate the number of bytes we need for the ArrayBuffer
+	//This will be 14 for the header, 26 bytes for track 1
+	//Then for track 2, 19 bytes plus the title length
+	//Plus 9 bytes for each note (4 on, 5 off)
+	//Truncate track name if needed
+	if(trackName.length > 127) {
+		trackName = trackName.substring(0, 128);
+	}
+
+	const size = 14 + 27 + 19 + trackName.length + 9*notes.length;
+	let writer = new DataViewWrapper(size);
+	writer.init();
+
+
+
+	//Start writing the bytes for the midi file
+	//First the header
+	//midi header
+	writer.writeString("MThd");
+	//header size
+	writer.writeUint32(6);
+	//midi format
+	writer.writeUint16(1);
+	//number of tracks
+	writer.writeUint16(2);
+	//ticks per beat
+	writer.writeUint16(0x0180);
+
+	//Write track 1
+	//This is all static, so just write it as a series of Uint32s and then any extras
+	writer.writeString("MTrk");
+	//length
+	writer.writeUint32(0x13);
+	//First part of set time signature command
+	writer.writeUint32(0x00ff5804);
+	//next part of time signature
+	writer.writeUint16(0x0402);
+	//Write a delay
+	writer.writeUint16(0x1808);
+
+
+	//Convert the tempo to us/beat
+	const usPerBeat = (1 / (tempoBPMDec / 60)) * 1e6;
+	//set tempo event
+	writer.writeUint32(0x00ff5103);
+	//Write the actual tempo
+	writer.writeUint8(usPerBeat >>> 16);
+	writer.writeUint8(usPerBeat >>> 8);
+	writer.writeUint8(usPerBeat & 0xff);
+	//Write end track
+	writer.writeUint32(0x00ff2f00);
+
+	//Write track 2
+	//First part of notes track
+	writer.writeString("MTrk");
+	//length of data following will be 4 + trackName length, + 7 + 9*notes length plus an extra byte for some reason??
+	const trackDataLength = 1 + 4 + trackName.length + 7 + 9*notes.length;
+	//Write the length
+	writer.writeUint32(trackDataLength);
+	//write set name command
+	writer.writeUint32(0x00ff0300 + trackName.length);
+	//write actual name
+	writer.writeString(trackName);
+	//Write program change command
+	writer.writeUint16(0x00C0);
+	writer.writeUint8(0x00);
+
+	//Write the actual notes
+	for(let i=0; i<notes.length; i++) {
+		//Write note on event
+		writer.writeUint16(0x0090);
+		writer.writeUint8(notes[i]);
+		writer.writeUint8(0x40);
+		//Write note off event
+		writer.writeUint16(0x8300);
+		writer.writeUint16(0x8000 + notes[i]);
+		writer.writeUint8(0x40);
+	}
+
+	//Write the end of track event
+	writer.writeUint32(0x00ff2f00);
+
+	//We are done with the file, return the blob
+	return writer.blob("audio/midi");
+
 }
 
 module.exports = {

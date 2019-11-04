@@ -105,6 +105,20 @@ Track 1: `MTrk | 00 00 00 27 | 00 FF 03 08 MapMusic | 00 FF 51 03 07 A1 20 | 00 
 (length = 0x27 bytes (39), set track title to MapMusic, set tempo to 120bpm (500k us/beat), set time signature to 4/4, note on C4 at delta-t 0, note off C4 at delta-t 384 ticks (variable rep 0x8300) )
 in that order
 
+
+#### Format 1 File Example
+
+Format 1 plays all tracks together, and has a control events track that sets the tempo, etc for the entire file.
+
+Header: `MThd | 00 00 00 06 | 00 01 | 00 02 | 01 80` (format 1, 2 tracks, 384 ticks/beat)
+
+Track 1 (control): `MTrk | 00 00 00 13 | 00 FF 58 04 04 02 | 18 08 00 FF 51 03 07 A1 20 | 00 FF 2F 00` (13 bytes length, set time signature to 4/4,
+then delay 394,240 ticks (variable len rep), then set tempo to 120bpm, then end track)
+
+Track 2 (notes): `MTrk | 00 00 00 xx | 00 FF 03 08 MapMusic | 00 C0 00 | 00 90 3c 40 | 83 00 80 3c 40 | 00 FF 2F 00` 
+(xx bytes length, set track name to MapMusic, set program/instrument for track 0 to 0, note on 3c, then 
+wait 384 ticks, then note off 3c, then end track)
+
 Text is obviously written as its bytes, the ASCII is just written here as shorthand.
 #### Converting Our Data to MIDI
 
