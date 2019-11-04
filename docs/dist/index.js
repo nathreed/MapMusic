@@ -962,13 +962,6 @@ function DataViewWrapper(fileSize) {
 	//Keep track of the offset we are writing to inside the dataView
 	this.offset = 0;
 
-	this.init = function() {
-		this.offset = 0;
-		this.buffer = new ArrayBuffer(fileSize);
-		this.view = new DataView(this.buffer);
-		return this; //for convenience use as part of object construction
-	};
-
 	//Functions for writing common types to the dataview
 	this.writeUint8 = function(val) {
 		this.view.setUint8(this.offset, val);
@@ -1121,7 +1114,6 @@ function encodeMIDIFormat1(notes, tempoBPMDec, trackName) {
 
 	const size = 14 + 27 + 19 + trackName.length + 9*notes.length;
 	let writer = new DataViewWrapper(size);
-	writer.init();
 
 
 
