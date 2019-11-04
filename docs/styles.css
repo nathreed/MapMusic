@@ -200,7 +200,7 @@ input[type="button"]:hover, .radioButton:hover, input[type="button"]:focus, .rad
 	overflow: auto;
 }
 
-#audioControlsSubmitButtons, #cashGo {
+#audioControlsSubmitButtons, #cashGo, #downloadMIDI {
 	text-align: center;
 	display: block;
 	margin: 0 auto;

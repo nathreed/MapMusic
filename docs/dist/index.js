@@ -843,7 +843,12 @@ $id("filePicker").onchange = function(e) {
 		//Hide the choose file button now that we are done
 		$id("chooseFileContainer").style.display = "none";
 	}
-}
+};
+
+$id("downloadMIDI").onclick = function() {
+	//cause midi file to download
+	setupMIDIDownload();
+};
 
 // Clear paths from the map
 function clearMapPaths() {
