@@ -285,6 +285,16 @@ $id("sampleToPredicate").onclick = function(e){
 	}
 }
 
+// Prevent default behavior for canvas interaction on mobile
+function preventDefaultOnCanvases(event) {
+	if (event.target == canvas) {
+		event.preventDefault();
+	}
+}
+document.body.addEventListener("touchstart", preventDefaultOnCanvases, false);
+document.body.addEventListener("touchmove", preventDefaultOnCanvases, false);
+document.body.addEventListener("touchend", preventDefaultOnCanvases, false);
+
 // Starting drawing (mirrored for touch)
 mapCanvasDOM.onmousedown = mapCanvasDOM.ontouchstart = function(e) {
 	// Set painting variables
