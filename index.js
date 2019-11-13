@@ -285,21 +285,18 @@ $id("sampleToPredicate").onclick = function(e){
 	}
 }
 
-// Prevent default behavior for canvas interaction on mobile
-function preventDefaultOnCanvases(event) {
-	if (event.target == canvas) {
-		event.preventDefault();
-	}
-}
-document.body.addEventListener("touchstart", preventDefaultOnCanvases, false);
-document.body.addEventListener("touchmove", preventDefaultOnCanvases, false);
-document.body.addEventListener("touchend", preventDefaultOnCanvases, false);
-
 // Starting drawing (mirrored for touch)
-mapCanvasDOM.onmousedown = mapCanvasDOM.ontouchstart = function(e) {
+mapCanvasDOM.onmousedown = (e) => canvasStartDrawing(e.offsetX, e.offsetY);
+mapCanvasDOM.ontouchstart = (e) => {
+	// Handle only one touch
+	let touch = e.targetTouches[0];
+	let canvasPosition = mapCanvasDOM.getBoundingClientRect();
+	canvasStartDrawing(touch.clientX - canvasPosition.left, touch.clientY - canvasPosition.top);
+};
+function canvasStartDrawing(offsetX, offsetY) {
 	// Set painting variables
 	painting = true;
-    let mouseLocation = L.point(e.offsetX, e.offsetY);
+    let mouseLocation = L.point(offsetX, offsetY);
 
     // Clear the old path
     if(stagedPath && !pathsList.includes(stagedPath)){
@@ -316,9 +313,17 @@ mapCanvasDOM.onmousedown = mapCanvasDOM.ontouchstart = function(e) {
 	mapCanvasContext.moveTo(mouseLocation.x, mouseLocation.y);
 };
 
-mapCanvasDOM.onmousemove = mapCanvasDOM.ontouchmove = function(e) {
+// While the mouse is moving
+mapCanvasDOM.onmousemove = (e) => canvasActivelyDrawing(e.offsetX, e.offsetY);
+mapCanvasDOM.ontouchmove = (e) => {
+	// Handle only one touch
+	let touch = e.targetTouches[0];
+	let canvasPosition = mapCanvasDOM.getBoundingClientRect();
+	canvasActivelyDrawing(touch.clientX - canvasPosition.left, touch.clientY - canvasPosition.top);
+};
+function canvasActivelyDrawing(offsetX, offsetY) {
 	if(painting) {
-        let mouseLocation = L.point(e.offsetX, e.offsetY);
+        let mouseLocation = L.point(offsetX, offsetY);
 
 		// Get the direction of the mouse movement (for use with: https://math.stackexchange.com/a/175906)
 		let v = mouseLocation.subtract(lineCoordinates[lineCoordinates.length - 1]);
@@ -339,7 +344,11 @@ mapCanvasDOM.onmousemove = mapCanvasDOM.ontouchmove = function(e) {
 	}
 };
 
-mapCanvasDOM.onmouseup = mapCanvasDOM.ontouchend = function(e) {
+// Closing off a path
+mapCanvasDOM.onmouseup = canvasFinishedDrawing;
+mapCanvasDOM.ontouchend = canvasFinishedDrawing;
+function canvasFinishedDrawing(e) {
+
 	// Check if there are enough points to do audio stuff
 	if(lineCoordinates.length >= 2) {
 		// Set up the new path
