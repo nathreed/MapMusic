@@ -291,7 +291,7 @@ mapCanvasDOM.ontouchstart = (e) => {
 	// Handle only one touch
 	let touch = e.targetTouches[0];
 	let canvasPosition = mapCanvasDOM.getBoundingClientRect();
-	canvasStartDrawing(touch.clientX - canvasPosition.left, touch.clientY - canvasPosition.top);
+	canvasStartDrawing(touch.clientX - canvasPosition.x, touch.clientY - canvasPosition.y);
 };
 function canvasStartDrawing(offsetX, offsetY) {
 	// Set painting variables
@@ -319,7 +319,7 @@ mapCanvasDOM.ontouchmove = (e) => {
 	// Handle only one touch
 	let touch = e.targetTouches[0];
 	let canvasPosition = mapCanvasDOM.getBoundingClientRect();
-	canvasActivelyDrawing(touch.clientX - canvasPosition.left, touch.clientY - canvasPosition.top);
+	canvasActivelyDrawing(touch.clientX - canvasPosition.x, touch.clientY - canvasPosition.y);
 };
 function canvasActivelyDrawing(offsetX, offsetY) {
 	if(painting) {
